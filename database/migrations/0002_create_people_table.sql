@@ -10,8 +10,8 @@ CREATE TABLE people
     family_uuid     TEXT,
     profile_picture BLOB,
     position_x      INTEGER,
-    position_y      INTEGER,
-    FOREIGN KEY (family_uuid) REFERENCES families (uuid) ON DELETE RESTRICT
+    position_y      INTEGER
+--     FOREIGN KEY (family_uuid) REFERENCES families (uuid) ON DELETE RESTRICT
 );
 
 -- +goose Down

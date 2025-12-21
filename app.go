@@ -1,16 +1,15 @@
 package main
 
 import (
+	"GenieAlogy/repositories"
 	"context"
 	"database/sql"
-	"encoding/json"
-	"log"
-	"os"
-
 	_ "database/sql"
+	"log"
+
+	"GenieAlogy/models"
 
 	"github.com/pressly/goose/v3"
-	_ "github.com/pressly/goose/v3"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	_ "modernc.org/sqlite"
 )
@@ -35,58 +34,26 @@ func MigrateDatabase(db *sql.DB) {
 		log.Fatal(err)
 	}
 
-	if err := goose.Up(db, "migrations"); err != nil {
+	if err := goose.Up(db, "database/migrations"); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func InsertDataIntoDatabase(db *sql.DB, saveFile SaveFile) {
+func InsertDataIntoDatabase(db *sql.DB, saveFile models.SaveFile) {
+	personRepo := repositories.PersonRepository{db}
+
 	for _, person := range saveFile.People {
-		_, err := db.Exec(
-			`INSERT OR REPLACE INTO people (
-       			uuid,
-				sex,
-				firstname,
-				lastname,
-				birthdate,
-				birthplace,
-				position_x,
-				position_y
-       		) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-			person.Uuid,
-			person.Sex,
-			person.Firstname,
-			person.Lastname,
-			person.Birthdate,
-			person.Birthplace,
-			person.Position.X,
-			person.Position.Y,
-		)
+		err := personRepo.Insert(person)
 
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
+
+	familyRepo := repositories.FamilyRepository{db}
 
 	for _, family := range saveFile.Families {
-		_, err := db.Exec(
-			`INSERT OR REPLACE INTO families (uuid, person_1_uuid, person_2_uuid) VALUES (?, ?, ?)`,
-			family.Uuid,
-			family.Person1Uuid,
-			family.Person2Uuid,
-		)
-
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-
-	for _, person := range saveFile.People {
-		_, err := db.Exec(
-			`UPDATE people SET family_uuid = ? WHERE uuid = ?`,
-			person.FamilyUuid,
-			person.Uuid,
-		)
+		err := familyRepo.Insert(family)
 
 		if err != nil {
 			log.Fatal(err)
@@ -94,7 +61,7 @@ func InsertDataIntoDatabase(db *sql.DB, saveFile SaveFile) {
 	}
 }
 
-func (a *App) LoadFile() (*SaveFile, error) {
+func (a *App) LoadFile() (*models.SaveFile, error) {
 	// Open file picker
 	path, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
 		Filters: []runtime.FileFilter{
@@ -108,20 +75,25 @@ func (a *App) LoadFile() (*SaveFile, error) {
 		return nil, err
 	}
 
-	// Create handle for picked file
-	file, err := os.Open(path)
+	db, _ := sql.Open("sqlite", path)
+	defer db.Close()
+
+	familyRepo := repositories.FamilyRepository{db}
+	personRepo := repositories.PersonRepository{db}
+
+	families, err := familyRepo.FetchAll()
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
 
-	defer file.Close()
+	people, err := personRepo.FetchAll()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	// Read & JSON-decode the picked file's contents
-	var saveFile SaveFile
-	decoder := json.NewDecoder(file)
-	decoder.DisallowUnknownFields()
-	if err := decoder.Decode(&saveFile); err != nil {
-		return nil, err
+	saveFile := models.SaveFile{
+		people,
+		families,
 	}
 
 	// Keep track of open file/project path
@@ -130,8 +102,21 @@ func (a *App) LoadFile() (*SaveFile, error) {
 	return &saveFile, nil
 }
 
-func (a *App) SaveFile(saveFile SaveFile) error {
-	db, _ := sql.Open("sqlite", "/Users/vincent/Code/GenieAlogy/tests/data/testdata2.geniealogy")
+func (a *App) SaveFile(saveFile models.SaveFile) error {
+	// Open file picker
+	path, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
+		Filters: []runtime.FileFilter{
+			{
+				DisplayName: "Geniealogy files",
+				Pattern:     "*.geniealogy",
+			},
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	db, _ := sql.Open("sqlite", path)
 	defer db.Close()
 
 	MigrateDatabase(db)

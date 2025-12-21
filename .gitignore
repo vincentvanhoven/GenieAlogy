@@ -1,3 +1,4 @@
+# Directories
 build/bin
 node_modules
 .vite
@@ -5,3 +6,6 @@ frontend/dist
 frontend/wailsjs
 .idea
 dist
+
+# Files
+test-database.geniealogy

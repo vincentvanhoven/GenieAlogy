@@ -1,8 +1,10 @@
 import { computed, ComputedRef, nextTick, Ref, ref, toRaw } from "vue";
 import { Node, Edge, useVueFlow, NodeSelectionChange } from "@vue-flow/core";
 import { SaveFile as DoSaveFile } from "../../wailsjs/go/main/App";
-import { main } from "../../wailsjs/go/models";
-import SaveFile = main.SaveFile;
+import { models } from "../../wailsjs/go/models";
+import SaveFile = models.SaveFile;
+import People = models.Person;
+import Family = models.Family;
 import { EventsOn } from "../../wailsjs/runtime";
 
 export function useEditor() {
@@ -21,8 +23,7 @@ export function useEditor() {
     const nodeWidth = 100;
 
     // Composables
-    const { project, updateNode, getSelectedNodes, onNodesChange } =
-        useVueFlow();
+    const { project, updateNode, getSelectedNodes, onNodesChange } = useVueFlow();
 
     // Computed properties
     const selectedNode: ComputedRef<Node | null> = computed(() => {
@@ -66,6 +67,8 @@ export function useEditor() {
         EventsOn("onSaveRequested", () => {
             saveConfiguration();
         });
+
+        loadConfiguration({people: <People[]>[], families: <Family[]>[]} as SaveFile);
     }
 
     function loadConfiguration(JSON: SaveFile) {
@@ -75,13 +78,13 @@ export function useEditor() {
 
         nodes.value = [
             ...dereffedSaveFile.people.map((person) => ({
-                id: "person-" + person.uuid.toString(),
+                id: "person-" + person.uuid,
                 type: "person",
                 position: person.position,
                 data: person,
             })),
             ...dereffedSaveFile.families.map((family) => ({
-                id: "family-" + family.uuid.toString(),
+                id: "family-" + family.uuid,
                 type: "family",
                 position: { x: 0, y: 0 },
                 draggable: false,
@@ -91,35 +94,35 @@ export function useEditor() {
 
         edges.value = [
             ...dereffedSaveFile.families.flatMap((family) => [
-                ...(family.person_1_uuid
+                ...(family.person_1_uuid.Valid
                     ? [
                           {
-                              id: "family-" + family.uuid.toString() + "-male",
+                              id: "family-" + family.uuid + "-male",
                               type: "straight",
-                              source: "person-" + family.person_1_uuid.toString(),
-                              target: "family-" + family.uuid.toString(),
+                              source: "person-" + family.person_1_uuid.String,
+                              target: "family-" + family.uuid,
                               style: { strokeWidth: 2 },
                           },
                       ]
                     : []),
-                ...(family.person_2_uuid
+                ...(family.person_2_uuid.Valid
                     ? [
                           {
-                              id: "family-" + family.uuid.toString() + "-female",
+                              id: "family-" + family.uuid + "-female",
                               type: "straight",
-                              source: "person-" + family.person_2_uuid.toString(),
-                              target: "family-" + family.uuid.toString(),
+                              source: "person-" + family.person_2_uuid.String,
+                              target: "family-" + family.uuid,
                               style: { strokeWidth: 2 },
                           },
                       ]
                     : []),
             ]),
             ...dereffedSaveFile.people
-                .filter((person) => person.family_uuid)
+                .filter((person) => person.family_uuid.Valid)
                 .map((person) => ({
-                    id: "family-" + person.family_uuid + "-child-" + person.uuid,
+                    id: "family-" + person.family_uuid.String + "-child-" + person.uuid,
                     type: "smoothstep",
-                    source: "family-" + person.family_uuid,
+                    source: "family-" + person.family_uuid.String,
                     target: "person-" + person.uuid,
                 })),
         ];
@@ -281,19 +284,19 @@ export function useEditor() {
             .filter((familyNode) => familyNode.type === "family")
             .filter((familyNode) => {
                 return [
-                    `person-${familyNode.data.person_1_id}`,
-                    `person-${familyNode.data.person_2_id}`,
-                ].includes(spouseNode.id);
+                    `person-${familyNode.data.person_1_id.String}`,
+                    `person-${familyNode.data.person_2_id.String}`,
+                ].includes(spouseNode.data.uuid);
             })
             .forEach((familyNode) => {
                 let searchNodeId =
-                    spouseNode.id === `person-${familyNode.data.person_1_id}`
-                        ? familyNode.data.person_2_id
-                        : familyNode.data.person_1_id;
+                    spouseNode.data.uuid === familyNode.data.person_1_id.String
+                        ? familyNode.data.person_2_id.String
+                        : familyNode.data.person_1_id.String;
 
                 let partnerNode = nodes.value.find(
                     (partnerNode) =>
-                        partnerNode.id === `person-${searchNodeId}`,
+                        partnerNode.data.uuid === searchNodeId,
                 ) as Node;
                 updateNodePosition(partnerNode, { y: spouseNode.position.y });
 
