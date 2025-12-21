@@ -1,62 +1,69 @@
-import {computed, ComputedRef, nextTick, Ref, ref, toRaw} from "vue";
-import {Node, Edge, useVueFlow, NodeSelectionChange} from '@vue-flow/core';
-import {SaveFile as DoSaveFile} from '../../wailsjs/go/main/App';
-import {main} from "../../wailsjs/go/models";
+import { computed, ComputedRef, nextTick, Ref, ref, toRaw } from "vue";
+import { Node, Edge, useVueFlow, NodeSelectionChange } from "@vue-flow/core";
+import { SaveFile as DoSaveFile } from "../../wailsjs/go/main/App";
+import { main } from "../../wailsjs/go/models";
 import SaveFile = main.SaveFile;
-import {EventsOn} from "../../wailsjs/runtime";
+import { EventsOn } from "../../wailsjs/runtime";
 
-export function useEditor()  {
+export function useEditor() {
     // Data
-    const saveFile: Ref<SaveFile|null> = ref(null);
+    const saveFile: Ref<SaveFile | null> = ref(null);
     const nodes = ref<Node[]>([]);
     const edges = ref<Edge[]>([]);
-    const selectedNodes = ref<Node[]>([])
-    const gridCanvas: Ref<HTMLCanvasElement|null> = ref(null);
+    const selectedNodes = ref<Node[]>([]);
+    const gridCanvas: Ref<HTMLCanvasElement | null> = ref(null);
 
     const baseCellSize = 50;
     const snapGrid = [50, 300];
     const dragStart = new Map<string, { x: number; y: number }>();
-    let offset = { x: 0, y: 0, zoom: 1 }
-    let initialMouse = { x: 0, y: 0 }
+    let offset = { x: 0, y: 0, zoom: 1 };
+    let initialMouse = { x: 0, y: 0 };
     const nodeWidth = 100;
 
     // Composables
-    const { project, updateNode, getSelectedNodes, onNodesChange } = useVueFlow()
+    const { project, updateNode, getSelectedNodes, onNodesChange } =
+        useVueFlow();
 
     // Computed properties
-    const selectedNode: ComputedRef<Node|null> = computed(() => {
+    const selectedNode: ComputedRef<Node | null> = computed(() => {
         return selectedNodes.value.length == 1 ? selectedNodes.value[0] : null;
-    })
+    });
 
     // Methods
     function init(htmlCanvasElement: HTMLCanvasElement) {
         gridCanvas.value = htmlCanvasElement;
 
         // Event listeners
-        window.addEventListener('resize', drawGrid)
+        window.addEventListener("resize", drawGrid);
 
         onNodesChange((changes) => {
             // Update selectedNodes
             changes
-                .filter(change => Object.hasOwn(change, 'selected'))
-                .map(change => change as NodeSelectionChange)
+                .filter((change) => Object.hasOwn(change, "selected"))
+                .map((change) => change as NodeSelectionChange)
                 .forEach((change) => {
                     if (change.selected) {
-                        selectedNodes.value.push(nodes.value.find(node => node.id === change.id) as Node);
+                        selectedNodes.value.push(
+                            nodes.value.find(
+                                (node) => node.id === change.id,
+                            ) as Node,
+                        );
                     } else {
-                        const index = selectedNodes.value.findIndex(node => node.id === change.id);
+                        const index = selectedNodes.value.findIndex(
+                            (node) => node.id === change.id,
+                        );
                         if (index !== -1) {
-                            selectedNodes.value.splice(index, 1)
+                            selectedNodes.value.splice(index, 1);
                         }
                     }
                 });
-        })
+        });
 
-        EventsOn('onSaveFileLoaded', (saveFile: SaveFile) => {
+        EventsOn("onSaveFileLoaded", (saveFile: SaveFile) => {
             loadConfiguration(saveFile);
         });
 
-        EventsOn('onSaveRequested', () => {
+        EventsOn("onSaveRequested", () => {
             saveConfiguration();
         });
     }
@@ -64,47 +71,57 @@ export function useEditor()  {
     function loadConfiguration(JSON: SaveFile) {
         saveFile.value = JSON;
 
-        let dereffedSaveFile = {...saveFile.value};
+        let dereffedSaveFile = { ...saveFile.value };
 
         nodes.value = [
             ...dereffedSaveFile.people.map((person) => ({
-                id: 'person-' + person.id.toString(),
-                type: 'person',
+                id: "person-" + person.id.toString(),
+                type: "person",
                 position: person.position,
                 data: person,
             })),
             ...dereffedSaveFile.families.map((family) => ({
-                id: 'family-' + family.id.toString(),
-                type: 'family',
-                position: {x: 0, y: 0},
+                id: "family-" + family.id.toString(),
+                type: "family",
+                position: { x: 0, y: 0 },
                 draggable: false,
                 data: family,
             })),
         ];
 
         edges.value = [
-            ...dereffedSaveFile.families.flatMap((family) => ([
-                ...family.person_1_id ? [{
-                    id: 'family-' + family.id.toString() + '-male',
-                    type: 'straight',
-                    source: 'person-' + family.person_1_id.toString(),
-                    target: 'family-' + family.id.toString(),
-                    style: { strokeWidth: 2 }
-                }] : [],
-                ...family.person_2_id ? [{
-                    id: 'family-' + family.id.toString() + '-female',
-                    type: 'straight',
-                    source: 'person-' + family.person_2_id.toString(),
-                    target: 'family-' + family.id.toString(),
-                    style: { strokeWidth: 2 }
-                }] : [],
-            ])),
-            ...dereffedSaveFile.people.filter((person) => person.family_id).map((person) => ({
-                id: 'family-' + person.family_id + '-child-' + person.id,
-                type: 'smoothstep',
-                source: 'family-' + person.family_id,
-                target: 'person-' + person.id,
-            }))
+            ...dereffedSaveFile.families.flatMap((family) => [
+                ...(family.person_1_id
+                    ? [
+                          {
+                              id: "family-" + family.id.toString() + "-male",
+                              type: "straight",
+                              source: "person-" + family.person_1_id.toString(),
+                              target: "family-" + family.id.toString(),
+                              style: { strokeWidth: 2 },
+                          },
+                      ]
+                    : []),
+                ...(family.person_2_id
+                    ? [
+                          {
+                              id: "family-" + family.id.toString() + "-female",
+                              type: "straight",
+                              source: "person-" + family.person_2_id.toString(),
+                              target: "family-" + family.id.toString(),
+                              style: { strokeWidth: 2 },
+                          },
+                      ]
+                    : []),
+            ]),
+            ...dereffedSaveFile.people
+                .filter((person) => person.family_id)
+                .map((person) => ({
+                    id: "family-" + person.family_id + "-child-" + person.id,
+                    type: "smoothstep",
+                    source: "family-" + person.family_id,
+                    target: "person-" + person.id,
+                })),
         ];
 
         nextTick(() => {
@@ -113,15 +130,15 @@ export function useEditor()  {
     }
 
     function saveConfiguration() {
-        DoSaveFile({...saveFile.value} as SaveFile);
+        DoSaveFile({ ...saveFile.value } as SaveFile);
     }
 
     function drawGrid() {
-        if(!gridCanvas.value) {
+        if (!gridCanvas.value) {
             return;
         }
 
-        const ctx = gridCanvas.value?.getContext('2d')!;
+        const ctx = gridCanvas.value?.getContext("2d")!;
         const width = gridCanvas.value.clientWidth;
         const height = gridCanvas.value.clientHeight;
         gridCanvas.value.width = width;
@@ -129,7 +146,7 @@ export function useEditor()  {
 
         const zoom = offset.zoom;
         const pattern = [3, 3]; // 3 rows filled, 3 rows blank
-        const colors = [null, '#f0f0f0'];
+        const colors = [null, "#f0f0f0"];
         const patternHeight = 6 * baseCellSize;
 
         ctx.clearRect(0, 0, width, height);
@@ -144,113 +161,114 @@ export function useEditor()  {
         const endY = startY + height / zoom;
 
         // Background stripes
-        let yWorld = Math.floor(startY / patternHeight) * patternHeight
+        let yWorld = Math.floor(startY / patternHeight) * patternHeight;
 
         while (yWorld < endY) {
-            let stripeY = yWorld
+            let stripeY = yWorld;
 
             for (let i = 0; i < pattern.length; i++) {
-                const rows = pattern[i]
-                const stripeHeight = rows * baseCellSize
-                const color = colors[i]
+                const rows = pattern[i];
+                const stripeHeight = rows * baseCellSize;
+                const color = colors[i];
 
                 if (color && stripeY + stripeHeight > startY) {
-                    ctx.fillStyle = color
+                    ctx.fillStyle = color;
                     ctx.fillRect(
                         Math.floor(startX / baseCellSize) * baseCellSize,
                         stripeY,
-                        Math.ceil((endX - startX) / baseCellSize) * baseCellSize,
-                        stripeHeight
-                    )
+                        Math.ceil((endX - startX) / baseCellSize) *
+                            baseCellSize,
+                        stripeHeight,
+                    );
                 }
 
-                stripeY += stripeHeight
-                if (stripeY > endY) break
+                stripeY += stripeHeight;
+                if (stripeY > endY) break;
             }
 
-            yWorld += patternHeight
+            yWorld += patternHeight;
         }
 
         // Vertical grid lines (only in first 3 rows of pattern)
-        ctx.strokeStyle = '#aaa'
+        ctx.strokeStyle = "#aaa";
 
         for (
             let x = Math.floor(startX / baseCellSize) * baseCellSize;
             x <= endX;
             x += baseCellSize
         ) {
-            let yWorld = Math.floor(startY / baseCellSize) * baseCellSize
+            let yWorld = Math.floor(startY / baseCellSize) * baseCellSize;
 
             while (yWorld <= endY) {
                 const yInPattern =
-                    ((yWorld % patternHeight) + patternHeight) % patternHeight
+                    ((yWorld % patternHeight) + patternHeight) % patternHeight;
 
                 if (yInPattern < 3 * baseCellSize) {
-                    ctx.beginPath()
-                    ctx.moveTo(x, yWorld)
-                    ctx.lineTo(x, Math.min(yWorld + baseCellSize, endY))
-                    ctx.stroke()
+                    ctx.beginPath();
+                    ctx.moveTo(x, yWorld);
+                    ctx.lineTo(x, Math.min(yWorld + baseCellSize, endY));
+                    ctx.stroke();
                 }
 
-                yWorld += baseCellSize
+                yWorld += baseCellSize;
             }
         }
 
         // Horizontal grid lines (only in first 3 rows)
-        yWorld = Math.floor(startY / baseCellSize) * baseCellSize
+        yWorld = Math.floor(startY / baseCellSize) * baseCellSize;
         while (yWorld <= endY) {
             const yInPattern =
-                ((yWorld % patternHeight) + patternHeight) % patternHeight
+                ((yWorld % patternHeight) + patternHeight) % patternHeight;
 
             if (yInPattern <= 3 * baseCellSize) {
-                ctx.beginPath()
-                ctx.moveTo(startX, yWorld)
-                ctx.lineTo(endX, yWorld)
-                ctx.stroke()
+                ctx.beginPath();
+                ctx.moveTo(startX, yWorld);
+                ctx.lineTo(endX, yWorld);
+                ctx.stroke();
             }
 
-            yWorld += baseCellSize
+            yWorld += baseCellSize;
         }
 
-        ctx.restore()
+        ctx.restore();
     }
 
-    function handleNodesSelectionDragStart({node, event}: any) {
-        const graphPos = project({ x: event.clientX, y: event.clientY })
-        initialMouse = { x: graphPos.x, y: graphPos.y }
+    function handleNodesSelectionDragStart({ node, event }: any) {
+        const graphPos = project({ x: event.clientX, y: event.clientY });
+        initialMouse = { x: graphPos.x, y: graphPos.y };
         dragStart.clear();
 
-        getSelectedNodes.value.forEach(selectedNode => {
+        getSelectedNodes.value.forEach((selectedNode) => {
             dragStart.set(selectedNode.id, {
                 x: selectedNode.position.x,
-                y: selectedNode.position.y
-            })
-        })
+                y: selectedNode.position.y,
+            });
+        });
     }
 
     function handleNodesSelectionDrag({ node, event }: any) {
         const graphPos = project({ x: event.clientX, y: event.clientY });
-        const dx = graphPos.x - initialMouse.x
-        const dy = graphPos.y - initialMouse.y
+        const dx = graphPos.x - initialMouse.x;
+        const dy = graphPos.y - initialMouse.y;
 
         getSelectedNodes.value
-            .filter(selectedNode => selectedNode.type !== 'family')
-            .forEach(selectedNode => {
+            .filter((selectedNode) => selectedNode.type !== "family")
+            .forEach((selectedNode) => {
                 handleNodeDrag(selectedNode, dx, dy);
             });
     }
 
     function handleNodeDrag(node: any, deltaX: number, deltaY: number) {
         const start = dragStart.get(node.id)!;
-        const newPosition = {x: start.x + deltaX, y: start.y + deltaY};
+        const newPosition = { x: start.x + deltaX, y: start.y + deltaY };
 
-        if (node.type === 'person') {
+        if (node.type === "person") {
             updateNodePosition(node, {
                 x: Math.round(newPosition.x / snapGrid[0]) * snapGrid[0],
                 y: Math.round(newPosition.y / snapGrid[1]) * snapGrid[1],
             });
 
-            adjustFamilyNodePositions(node)
+            adjustFamilyNodePositions(node);
         }
     }
 
@@ -260,82 +278,109 @@ export function useEditor()  {
 
     function adjustFamilyNodePositions(spouseNode: Node) {
         nodes.value
-            .filter(familyNode => familyNode.type === 'family')
-            .filter(familyNode => {
+            .filter((familyNode) => familyNode.type === "family")
+            .filter((familyNode) => {
                 return [
                     `person-${familyNode.data.person_1_id}`,
-                    `person-${familyNode.data.person_2_id}`
+                    `person-${familyNode.data.person_2_id}`,
                 ].includes(spouseNode.id);
             })
-            .forEach(familyNode => {
-                let searchNodeId = spouseNode.id === `person-${familyNode.data.person_1_id}`
-                    ? familyNode.data.person_2_id
-                    : familyNode.data.person_1_id;
+            .forEach((familyNode) => {
+                let searchNodeId =
+                    spouseNode.id === `person-${familyNode.data.person_1_id}`
+                        ? familyNode.data.person_2_id
+                        : familyNode.data.person_1_id;
 
-                let partnerNode = nodes.value.find(partnerNode => partnerNode.id === `person-${searchNodeId}`) as Node;
-                updateNodePosition(partnerNode, {y: spouseNode.position.y});
+                let partnerNode = nodes.value.find(
+                    (partnerNode) =>
+                        partnerNode.id === `person-${searchNodeId}`,
+                ) as Node;
+                updateNodePosition(partnerNode, { y: spouseNode.position.y });
 
-                let leftPoint = (partnerNode.position.x + nodeWidth);
+                let leftPoint = partnerNode.position.x + nodeWidth;
                 let rightPoint = spouseNode.position.x;
                 updateNodePosition(familyNode, {
-                    x: leftPoint - ((leftPoint - rightPoint) / 2) - 12.5,
+                    x: leftPoint - (leftPoint - rightPoint) / 2 - 12.5,
                     y: spouseNode.position.y + 50 + 12.5,
                 });
 
-                if(partnerNode.position.x !== spouseNode.position.x) {
-                    let leftNode = partnerNode.position.x < spouseNode.position.x ? partnerNode : spouseNode;
-                    let rightNode = partnerNode.position.x > spouseNode.position.x ? partnerNode : spouseNode;
+                if (partnerNode.position.x !== spouseNode.position.x) {
+                    let leftNode =
+                        partnerNode.position.x < spouseNode.position.x
+                            ? partnerNode
+                            : spouseNode;
+                    let rightNode =
+                        partnerNode.position.x > spouseNode.position.x
+                            ? partnerNode
+                            : spouseNode;
 
-                    let maleEdge = edges.value.find(edge => familyNode.id.toString() + '-male' === edge.id);
-                    let femaleEdge = edges.value.find(edge => familyNode.id.toString() + '-female' === edge.id);
+                    let maleEdge = edges.value.find(
+                        (edge) =>
+                            familyNode.id.toString() + "-male" === edge.id,
+                    );
+                    let femaleEdge = edges.value.find(
+                        (edge) =>
+                            familyNode.id.toString() + "-female" === edge.id,
+                    );
 
-                    if(maleEdge && maleEdge.source == leftNode.id) {
-                        maleEdge.sourceHandle = 'right';
-                        maleEdge.targetHandle = 'left';
-                    } else if(maleEdge && maleEdge.source == rightNode.id) {
-                        maleEdge.sourceHandle = 'left';
-                        maleEdge.targetHandle = 'right';
+                    if (maleEdge && maleEdge.source == leftNode.id) {
+                        maleEdge.sourceHandle = "right";
+                        maleEdge.targetHandle = "left";
+                    } else if (maleEdge && maleEdge.source == rightNode.id) {
+                        maleEdge.sourceHandle = "left";
+                        maleEdge.targetHandle = "right";
                     }
 
-                    if(femaleEdge && femaleEdge.source == leftNode.id) {
-                        femaleEdge.sourceHandle = 'right';
-                        femaleEdge.targetHandle = 'left';
-                    } else if(femaleEdge && femaleEdge.source == rightNode.id) {
-                        femaleEdge.sourceHandle = 'left';
-                        femaleEdge.targetHandle = 'right';
+                    if (femaleEdge && femaleEdge.source == leftNode.id) {
+                        femaleEdge.sourceHandle = "right";
+                        femaleEdge.targetHandle = "left";
+                    } else if (
+                        femaleEdge &&
+                        femaleEdge.source == rightNode.id
+                    ) {
+                        femaleEdge.sourceHandle = "left";
+                        femaleEdge.targetHandle = "right";
                     }
                 }
             });
     }
 
-    function updateNodePosition(node: Node, position: {x?: number, y?: number}) {
-        let oldPosition = {...node.position};
+    function updateNodePosition(
+        node: Node,
+        position: { x?: number; y?: number },
+    ) {
+        let oldPosition = { ...node.position };
         let newPosition = {
             x: position.x ?? node.position.x,
             y: position.y ?? node.position.y,
         };
 
-        if (newPosition.x !== oldPosition.x || newPosition.y !== oldPosition.y) {
+        if (
+            newPosition.x !== oldPosition.x ||
+            newPosition.y !== oldPosition.y
+        ) {
             updateNode(node.id, (node) => ({
                 position: newPosition,
-            }))
+            }));
         }
     }
 
     function onMove({ event, flowTransform }: any) {
-        offset.x = flowTransform.x
-        offset.y = flowTransform.y
+        offset.x = flowTransform.x;
+        offset.y = flowTransform.y;
         offset.zoom = flowTransform.zoom;
 
         drawGrid();
     }
 
     return {
-        nodes, edges, selectedNode,
+        nodes,
+        edges,
+        selectedNode,
         init,
         drawGrid,
         handleNodesSelectionDragStart,
         handleNodesSelectionDrag,
         onMove,
-    }
+    };
 }

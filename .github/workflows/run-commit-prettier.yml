@@ -1,0 +1,33 @@
+name: Run Prettier and commited changes
+
+on:
+  push:
+    branches: [main, initial-setup]
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  prettier:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npx prettier --write .
+      - name: Commit changes
+        run: |
+          if git diff --quiet; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "chore: format with prettier"
+          git push

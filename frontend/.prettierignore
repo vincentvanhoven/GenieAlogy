@@ -1,0 +1,5 @@
+.vite/
+dist/
+wailsjs/
+package.json
+package-lock.json

@@ -1,0 +1,5 @@
+{
+    "plugins": ["prettier-plugin-classnames"],
+    "vueIndentScriptAndStyle": true,
+    "tabWidth": 4
+}
