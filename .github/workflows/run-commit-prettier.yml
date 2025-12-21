@@ -2,7 +2,7 @@ name: Run Prettier and commited changes
 
 on:
   push:
-    branches: [main, initial-setup]
+    branches: [develop]
   pull_request:
 
 permissions:
