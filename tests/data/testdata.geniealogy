@@ -1,39 +1,39 @@
 {
   "people": [
     {
-      "id": 1,
+      "uuid": "1",
       "sex": "female",
       "firstname": "Jane",
       "lastname": "Doe",
       "birthdate": "1950-01-01",
       "birthplace": "New York",
-      "family_id": 0,
+      "family_uuid": "0",
       "position": {
         "x": 0,
         "y": 0
       }
     },
     {
-      "id": 2,
+      "uuid": "2",
       "sex": "male",
       "firstname": "John",
       "lastname": "Doe",
       "birthdate": "1950-01-01",
       "birthplace": "New York",
-      "family_id": 0,
+      "family_uuid": "0",
       "position": {
         "x": 200,
         "y": 0
       }
     },
     {
-      "id": 3,
+      "uuid": "3",
       "sex": "female",
       "firstname": "Janet",
       "lastname": "Doe",
       "birthdate": "1975-01-01",
       "birthplace": "New York",
-      "family_id": 1,
+      "family_uuid": "1",
       "position": {
         "x": 100,
         "y": 300
@@ -42,9 +42,9 @@
   ],
   "families": [
     {
-      "id": 1,
-      "person_1_id": 2,
-      "person_2_id": 1
+      "uuid": "1",
+      "person_1_uuid": "2",
+      "person_2_uuid": "1"
     }
   ]
 }

@@ -6,20 +6,20 @@ type Position struct {
 }
 
 type Person struct {
-	Id         int      `json:"id"`
+	Uuid       string   `json:"uuid"`
 	Sex        string   `json:"sex"`
 	Firstname  string   `json:"firstname"`
 	Lastname   string   `json:"lastname"`
 	Birthdate  string   `json:"birthdate"`
 	Birthplace string   `json:"birthplace"`
-	FamilyId   int      `json:"family_id"`
+	FamilyUuid string   `json:"family_uuid"`
 	Position   Position `json:"position"`
 }
 
 type Family struct {
-	Id        int `json:"id"`
-	Person1Id int `json:"person_1_id"`
-	Person2Id int `json:"person_2_id"`
+	Uuid        string `json:"uuid"`
+	Person1Uuid string `json:"person_1_uuid"`
+	Person2Uuid string `json:"person_2_uuid"`
 }
 
 type SaveFile struct {

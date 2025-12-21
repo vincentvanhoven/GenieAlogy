@@ -75,13 +75,13 @@ export function useEditor() {
 
         nodes.value = [
             ...dereffedSaveFile.people.map((person) => ({
-                id: "person-" + person.id.toString(),
+                id: "person-" + person.uuid.toString(),
                 type: "person",
                 position: person.position,
                 data: person,
             })),
             ...dereffedSaveFile.families.map((family) => ({
-                id: "family-" + family.id.toString(),
+                id: "family-" + family.uuid.toString(),
                 type: "family",
                 position: { x: 0, y: 0 },
                 draggable: false,
@@ -91,36 +91,36 @@ export function useEditor() {
 
         edges.value = [
             ...dereffedSaveFile.families.flatMap((family) => [
-                ...(family.person_1_id
+                ...(family.person_1_uuid
                     ? [
                           {
-                              id: "family-" + family.id.toString() + "-male",
+                              id: "family-" + family.uuid.toString() + "-male",
                               type: "straight",
-                              source: "person-" + family.person_1_id.toString(),
-                              target: "family-" + family.id.toString(),
+                              source: "person-" + family.person_1_uuid.toString(),
+                              target: "family-" + family.uuid.toString(),
                               style: { strokeWidth: 2 },
                           },
                       ]
                     : []),
-                ...(family.person_2_id
+                ...(family.person_2_uuid
                     ? [
                           {
-                              id: "family-" + family.id.toString() + "-female",
+                              id: "family-" + family.uuid.toString() + "-female",
                               type: "straight",
-                              source: "person-" + family.person_2_id.toString(),
-                              target: "family-" + family.id.toString(),
+                              source: "person-" + family.person_2_uuid.toString(),
+                              target: "family-" + family.uuid.toString(),
                               style: { strokeWidth: 2 },
                           },
                       ]
                     : []),
             ]),
             ...dereffedSaveFile.people
-                .filter((person) => person.family_id)
+                .filter((person) => person.family_uuid)
                 .map((person) => ({
-                    id: "family-" + person.family_id + "-child-" + person.id,
+                    id: "family-" + person.family_uuid + "-child-" + person.uuid,
                     type: "smoothstep",
-                    source: "family-" + person.family_id,
-                    target: "person-" + person.id,
+                    source: "family-" + person.family_uuid,
+                    target: "person-" + person.uuid,
                 })),
         ];
 

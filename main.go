@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"log"
 	"runtime"
 
 	"github.com/wailsapp/wails/v2"
@@ -30,7 +31,7 @@ func main() {
 	FileMenu.AddText("Open", keys.CmdOrCtrl("o"), func(_ *menu.CallbackData) {
 		saveFile, err := app.LoadFile()
 		if err != nil {
-			return
+			log.Default().Println(err)
 		}
 		rt.EventsEmit(app.ctx, "onSaveFileLoaded", saveFile)
 	})
