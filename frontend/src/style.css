@@ -11,4 +11,5 @@
 
 .vue-flow__node-person.selected {
     @apply shadow-xl outline-2 outline-blue-400;
+    @apply focus:outline-2 focus:outline-blue-400;
 }
