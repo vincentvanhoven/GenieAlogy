@@ -9,9 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func RunPeopleSeeder(db *sql.DB) {
-	repo := repositories.PersonRepository{db}
-
+func RunPeopleSeeder() {
 	persons := []models.Person{
 		{
 			uuid.New().String(),
@@ -82,7 +80,7 @@ func RunPeopleSeeder(db *sql.DB) {
 	}
 
 	for _, p := range persons {
-		err := repo.Insert(p)
+		err := repositories.PersonRepo.Create(p)
 
 		if err != nil {
 			log.Fatal(err)

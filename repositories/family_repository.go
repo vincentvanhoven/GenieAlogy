@@ -2,15 +2,14 @@ package repositories
 
 import (
 	"GenieAlogy/models"
-	"database/sql"
 )
 
-type FamilyRepository struct {
-	DB *sql.DB
-}
+type FamilyRepository struct{}
 
-func (r *FamilyRepository) Insert(f models.Family) error {
-	_, err := r.DB.Exec(
+var FamilyRepo = &FamilyRepository{}
+
+func (repo *FamilyRepository) Create(f models.Family) error {
+	_, err := DatabaseRepo.DB.Exec(
 		`
 			INSERT INTO families (uuid, person_1_uuid, person_2_uuid)
          	VALUES (?, ?, ?)
@@ -21,10 +20,10 @@ func (r *FamilyRepository) Insert(f models.Family) error {
 	return err
 }
 
-func (r *FamilyRepository) Fetch(uuid string) (*models.Family, error) {
+func (repo *FamilyRepository) Fetch(uuid string) (*models.Family, error) {
 	var f models.Family
 
-	err := r.DB.QueryRow(
+	err := DatabaseRepo.DB.QueryRow(
 		`SELECT
     		uuid, person_1_uuid, person_2_uuid
          	FROM families
@@ -39,10 +38,10 @@ func (r *FamilyRepository) Fetch(uuid string) (*models.Family, error) {
 	return &f, nil
 }
 
-func (r *FamilyRepository) FetchAll() ([]models.Family, error) {
+func (repo *FamilyRepository) FetchAll() ([]models.Family, error) {
 	var f []models.Family
 
-	rows, err := r.DB.Query(`SELECT * FROM families`)
+	rows, err := DatabaseRepo.DB.Query(`SELECT * FROM families`)
 	if err != nil {
 		return f, err
 	}
@@ -67,21 +66,21 @@ func (r *FamilyRepository) FetchAll() ([]models.Family, error) {
 	return f, nil
 }
 
-func (r *FamilyRepository) Update(f models.Family) error {
-	_, err := r.DB.Exec(
+func (repo *FamilyRepository) Update(f models.Family) error {
+	_, err := DatabaseRepo.DB.Exec(
 		`
 			UPDATE families
 			SET person_1_uuid=?, person_2_uuid=?
 			WHERE uuid=?
 		`,
-		f.Uuid, f.Person1Uuid, f.Person2Uuid,
+		f.Person1Uuid, f.Person2Uuid, f.Uuid,
 	)
 
 	return err
 }
 
-func (r *FamilyRepository) Delete(uuid string) error {
-	_, err := r.DB.Exec(
+func (repo *FamilyRepository) Delete(uuid string) error {
+	_, err := DatabaseRepo.DB.Exec(
 		`DELETE FROM families WHERE uuid=?`,
 		uuid,
 	)

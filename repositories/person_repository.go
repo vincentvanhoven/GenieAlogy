@@ -2,15 +2,15 @@ package repositories
 
 import (
 	"GenieAlogy/models"
-	"database/sql"
 )
 
 type PersonRepository struct {
-	DB *sql.DB
 }
 
-func (r *PersonRepository) Insert(p models.Person) error {
-	_, err := r.DB.Exec(
+var PersonRepo = &PersonRepository{}
+
+func (repo *PersonRepository) Create(p models.Person) error {
+	_, err := DatabaseRepo.DB.Exec(
 		`
 			INSERT INTO people (
 				uuid, sex, firstname, lastname, birthdate, birthplace, family_uuid, position_x, position_y
@@ -23,10 +23,10 @@ func (r *PersonRepository) Insert(p models.Person) error {
 	return err
 }
 
-func (r *PersonRepository) Fetch(uuid string) (*models.Person, error) {
+func (repo *PersonRepository) Fetch(uuid string) (*models.Person, error) {
 	var p models.Person
 
-	err := r.DB.
+	err := DatabaseRepo.DB.
 		QueryRow(`SELECT * FROM people WHERE uuid = ?`, uuid).
 		Scan(&p.Uuid, &p.Sex, &p.Firstname, &p.Lastname, &p.Birthdate, &p.Birthplace, &p.FamilyUuid, &p.ProfilePicture, &p.Position.X, &p.Position.Y)
 
@@ -36,10 +36,10 @@ func (r *PersonRepository) Fetch(uuid string) (*models.Person, error) {
 	return &p, nil
 }
 
-func (r *PersonRepository) FetchAll() ([]models.Person, error) {
+func (repo *PersonRepository) FetchAll() ([]models.Person, error) {
 	var p []models.Person
 
-	rows, err := r.DB.Query(`SELECT * FROM people`)
+	rows, err := DatabaseRepo.DB.Query(`SELECT * FROM people`)
 	if err != nil {
 		return p, err
 	}
@@ -75,11 +75,11 @@ func (r *PersonRepository) FetchAll() ([]models.Person, error) {
 	return p, nil
 }
 
-func (r *PersonRepository) Update(p models.Person) error {
-	_, err := r.DB.Exec(
+func (repo *PersonRepository) Update(p models.Person) error {
+	_, err := DatabaseRepo.DB.Exec(
 		`
 			UPDATE people
-			SET sex=?, firstname=?, lastname=?, birthdate=?, birthplace=?, family_uuid=?, profile_picutre=?, position_x=?, position_y=?
+			SET sex=?, firstname=?, lastname=?, birthdate=?, birthplace=?, family_uuid=?, profile_picture=?, position_x=?, position_y=?
 			WHERE uuid=?
 		`,
 		p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyUuid, p.ProfilePicture, p.Position.X, p.Position.Y, p.Uuid, p.Uuid,
@@ -88,8 +88,8 @@ func (r *PersonRepository) Update(p models.Person) error {
 	return err
 }
 
-func (r *PersonRepository) Delete(uuid string) error {
-	_, err := r.DB.Exec(
+func (repo *PersonRepository) Delete(uuid string) error {
+	_, err := DatabaseRepo.DB.Exec(
 		`DELETE FROM people WHERE uuid=?`,
 		uuid,
 	)

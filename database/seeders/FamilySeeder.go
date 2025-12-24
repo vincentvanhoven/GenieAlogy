@@ -11,10 +11,8 @@ import (
 	"github.com/google/uuid"
 )
 
-func RunFamilySeeder(db *sql.DB) {
-	personRepo := repositories.PersonRepository{db}
-
-	people, _ := personRepo.FetchAll()
+func RunFamilySeeder() {
+	people, _ := repositories.PersonRepo.FetchAll()
 	grouped := make(map[string][]models.Person)
 
 	for _, p := range people {
@@ -47,7 +45,7 @@ func RunFamilySeeder(db *sql.DB) {
 		strings.Join(placeholders, ", "),
 	)
 
-	_, err := db.Exec(query, args...)
+	_, err := repositories.DatabaseRepo.DB.Exec(query, args...)
 	if err != nil {
 		log.Fatal(err)
 	}

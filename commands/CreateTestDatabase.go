@@ -26,6 +26,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	seeders.RunPeopleSeeder(db)
-	seeders.RunFamilySeeder(db)
+	seeders.RunPeopleSeeder()
+	seeders.RunFamilySeeder()
 }
