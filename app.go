@@ -39,6 +39,11 @@ func (a *App) LoadFile() (*models.SaveFile, error) {
 		return nil, err
 	}
 
+	err = repositories.DatabaseRepo.Fetch(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	families, err := repositories.FamilyRepo.FetchAll()
 	if err != nil {
 		log.Fatal(err)
