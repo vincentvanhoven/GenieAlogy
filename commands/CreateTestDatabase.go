@@ -1,28 +1,19 @@
 package main
 
 import (
-	"database/sql"
-	"log"
-
 	"GenieAlogy/database/seeders"
-
-	"github.com/pressly/goose/v3"
-	_ "modernc.org/sqlite"
+	"GenieAlogy/repositories"
+	"log"
 )
 
 func main() {
-	db, err := sql.Open("sqlite", "test-database.geniealogy")
-	defer db.Close()
-
+	err := repositories.DatabaseRepo.Fetch("test-database.geniealogy")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err := goose.SetDialect("sqlite3"); err != nil {
-		log.Fatal(err)
-	}
-
-	if err := goose.Up(db, "database/migrations"); err != nil {
+	err = repositories.DatabaseRepo.Update()
+	if err != nil {
 		log.Fatal(err)
 	}
 
