@@ -21,6 +21,8 @@ jobs:
       # The frontend assets are embedded in Go, and the frontend uses Wails assets, requiring the following steps:
       - name: Setup Wails
         run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.11.0
+      - name: Install Linux dependencies
+        run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev
       - name: Build the Wails frontend assets
         run: wails build
       - name: Build the frontend
