@@ -14,11 +14,17 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 20
-      - name: Set up Go
+      - name: Setup Go
         uses: actions/setup-go@v6
         with:
           go-version: 1.24.0
-      - name: Build frontend
+      # The frontend assets are embedded in Go, and the frontend uses Wails assets, requiring the following steps:
+      - name: Setup Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.11.0
+      - name: Build the Wails frontend assets
+        run: wails build
+      - name: Build the frontend
         run: cd frontend && npm ci && npm run build && cd ..
+      # Actually run the tests:
       - name: Run tests
         run: go test -v ./...
