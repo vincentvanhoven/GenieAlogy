@@ -1,4 +1,4 @@
-name: Run Prettier and commited changes
+name: Run Prettier and commit changes
 
 on:
   push:
@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   prettier:
+    name: "Run Prettier and commit changes"
     runs-on: ubuntu-latest
     defaults:
       run:

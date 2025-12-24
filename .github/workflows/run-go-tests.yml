@@ -7,6 +7,7 @@ on:
 
 jobs:
   test:
+    name: "Run Go tests"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -14,6 +15,7 @@ jobs:
         uses: actions/setup-go@v6
         with:
           go-version: 1.24.0
-
+      - name: Build frontend
+        run: cd frontend && npm run dev && cd ..
       - name: Run tests
         run: go test -v ./...
