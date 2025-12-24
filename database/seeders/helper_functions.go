@@ -1,3 +1,3 @@
 package seeders
 
-func ptr(s string) *string { return &s }
+func Strptr(s string) *string { return &s }

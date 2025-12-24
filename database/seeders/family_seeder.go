@@ -21,13 +21,13 @@ func RunFamilySeeder() {
 	families := []models.Family{
 		{
 			uuid.New().String(),
-			ptr(grouped["male"][0].Uuid),
-			ptr(grouped["female"][0].Uuid),
+			Strptr(grouped["male"][0].Uuid),
+			Strptr(grouped["female"][0].Uuid),
 		},
 		{
 			uuid.New().String(),
-			ptr(grouped["male"][1].Uuid),
-			ptr(grouped["female"][1].Uuid),
+			Strptr(grouped["male"][1].Uuid),
+			Strptr(grouped["female"][1].Uuid),
 		},
 	}
 

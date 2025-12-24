@@ -4,10 +4,10 @@ import (
 	"GenieAlogy/database/seeders"
 	"GenieAlogy/models"
 	"GenieAlogy/repositories"
-	"database/sql"
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFamilyRepository_FetchAll(t *testing.T) {
@@ -31,8 +31,8 @@ func TestFamilyRepository_Create_Fetch(t *testing.T) {
 
 	familyCreateData := models.Family{
 		uuid.New().String(),
-		sql.NullString{uuid.New().String(), true},
-		sql.NullString{uuid.New().String(), true},
+		seeders.Strptr(uuid.New().String()),
+		seeders.Strptr(uuid.New().String()),
 	}
 
 	err := repositories.FamilyRepo.Create(familyCreateData)
@@ -47,9 +47,7 @@ func TestFamilyRepository_Create_Fetch(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if *family != familyCreateData {
-		t.Fatal("family could not be inserted")
-	}
+	assert.Equal(t, familyCreateData, *family)
 }
 
 func TestFamilyRepository_Update_Fetch(t *testing.T) {
@@ -57,8 +55,8 @@ func TestFamilyRepository_Update_Fetch(t *testing.T) {
 
 	familyCreateData := models.Family{
 		uuid.New().String(),
-		sql.NullString{uuid.New().String(), true},
-		sql.NullString{uuid.New().String(), true},
+		seeders.Strptr(uuid.New().String()),
+		seeders.Strptr(uuid.New().String()),
 	}
 
 	err := repositories.FamilyRepo.Create(familyCreateData)
@@ -69,8 +67,8 @@ func TestFamilyRepository_Update_Fetch(t *testing.T) {
 
 	familyUpdateData := models.Family{
 		familyCreateData.Uuid,
-		sql.NullString{uuid.New().String(), true},
-		sql.NullString{uuid.New().String(), true},
+		seeders.Strptr(uuid.New().String()),
+		seeders.Strptr(uuid.New().String()),
 	}
 
 	err = repositories.FamilyRepo.Update(familyUpdateData)
@@ -84,13 +82,8 @@ func TestFamilyRepository_Update_Fetch(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if *family == familyCreateData {
-		t.Fatal("family was not updated")
-	}
-
-	if *family != familyUpdateData {
-		t.Fatal("family was updated, but not correctly")
-	}
+	assert.NotEqual(t, familyCreateData, *family)
+	assert.Equal(t, familyUpdateData, *family)
 }
 
 func TestFamilyRepository_Delete_Fetch(t *testing.T) {
@@ -98,8 +91,8 @@ func TestFamilyRepository_Delete_Fetch(t *testing.T) {
 
 	familyCreateData := models.Family{
 		uuid.New().String(),
-		sql.NullString{uuid.New().String(), true},
-		sql.NullString{uuid.New().String(), true},
+		seeders.Strptr(uuid.New().String()),
+		seeders.Strptr(uuid.New().String()),
 	}
 
 	err := repositories.FamilyRepo.Create(familyCreateData)

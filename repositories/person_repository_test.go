@@ -4,10 +4,10 @@ import (
 	"GenieAlogy/database/seeders"
 	"GenieAlogy/models"
 	"GenieAlogy/repositories"
-	"database/sql"
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestPersonRepository_FetchAll(t *testing.T) {
@@ -31,12 +31,12 @@ func TestPersonRepository_Create_Fetch(t *testing.T) {
 	personCreateData := models.Person{
 		uuid.New().String(),
 		"male",
-		sql.NullString{"John", true},
-		sql.NullString{"Doe", true},
-		sql.NullString{"1950-01-01", true},
-		sql.NullString{"New York", true},
-		sql.NullString{"", false},
-		sql.NullString{"", false},
+		seeders.Strptr("John"),
+		seeders.Strptr("Doe"),
+		seeders.Strptr("1950-01-01"),
+		seeders.Strptr("New York"),
+		nil,
+		nil,
 		models.Position{X: 0, Y: 0},
 	}
 
@@ -52,9 +52,7 @@ func TestPersonRepository_Create_Fetch(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if *person != personCreateData {
-		t.Fatal("person could not be inserted")
-	}
+	assert.Equal(t, personCreateData, *person)
 }
 
 func TestPersonRepository_Update_Fetch(t *testing.T) {
@@ -63,12 +61,12 @@ func TestPersonRepository_Update_Fetch(t *testing.T) {
 	personCreateData := models.Person{
 		uuid.New().String(),
 		"male",
-		sql.NullString{"John", true},
-		sql.NullString{"Doe", true},
-		sql.NullString{"1950-01-01", true},
-		sql.NullString{"New York", true},
-		sql.NullString{"", false},
-		sql.NullString{"", false},
+		seeders.Strptr("John"),
+		seeders.Strptr("Doe"),
+		seeders.Strptr("1950-01-01"),
+		seeders.Strptr("New York"),
+		nil,
+		nil,
 		models.Position{X: 0, Y: 0},
 	}
 
@@ -81,12 +79,12 @@ func TestPersonRepository_Update_Fetch(t *testing.T) {
 	personUpdateData := models.Person{
 		personCreateData.Uuid,
 		"male",
-		sql.NullString{"Jane", true},
-		sql.NullString{"Johnson", true},
-		sql.NullString{"1951-01-01", true},
-		sql.NullString{"Los Angeles", true},
-		sql.NullString{"", false},
-		sql.NullString{"", false},
+		seeders.Strptr("James"),
+		seeders.Strptr("Johnson"),
+		seeders.Strptr("1951-01-01"),
+		seeders.Strptr("Los Angeles"),
+		nil,
+		nil,
 		models.Position{X: 1, Y: 2},
 	}
 
@@ -101,13 +99,8 @@ func TestPersonRepository_Update_Fetch(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if *person == personCreateData {
-		t.Fatal("person was not updated")
-	}
-
-	if *person != personUpdateData {
-		t.Fatal("person was updated, but not correctly")
-	}
+	assert.NotEqual(t, personCreateData, *person)
+	assert.Equal(t, personUpdateData, *person)
 }
 
 func TestPersonRepository_Delete_Fetch(t *testing.T) {
@@ -116,12 +109,12 @@ func TestPersonRepository_Delete_Fetch(t *testing.T) {
 	personCreateData := models.Person{
 		uuid.New().String(),
 		"male",
-		sql.NullString{"John", true},
-		sql.NullString{"Doe", true},
-		sql.NullString{"1950-01-01", true},
-		sql.NullString{"New York", true},
-		sql.NullString{"", false},
-		sql.NullString{"", false},
+		seeders.Strptr("John"),
+		seeders.Strptr("Doe"),
+		seeders.Strptr("1950-01-01"),
+		seeders.Strptr("New York"),
+		nil,
+		nil,
 		models.Position{X: 0, Y: 0},
 	}
 
