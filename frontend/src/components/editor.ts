@@ -94,23 +94,23 @@ export function useEditor() {
 
         edges.value = [
             ...dereffedSaveFile.families.flatMap((family) => [
-                ...(family.person_1_uuid.Valid
+                ...(family.person_1_uuid
                     ? [
                           {
                               id: "family-" + family.uuid + "-male",
                               type: "straight",
-                              source: "person-" + family.person_1_uuid.String,
+                              source: "person-" + family.person_1_uuid,
                               target: "family-" + family.uuid,
                               style: { strokeWidth: 2 },
                           },
                       ]
                     : []),
-                ...(family.person_2_uuid.Valid
+                ...(family.person_2_uuid
                     ? [
                           {
                               id: "family-" + family.uuid + "-female",
                               type: "straight",
-                              source: "person-" + family.person_2_uuid.String,
+                              source: "person-" + family.person_2_uuid,
                               target: "family-" + family.uuid,
                               style: { strokeWidth: 2 },
                           },
@@ -118,11 +118,11 @@ export function useEditor() {
                     : []),
             ]),
             ...dereffedSaveFile.people
-                .filter((person) => person.family_uuid.Valid)
+                .filter((person) => person.family_uuid)
                 .map((person) => ({
-                    id: "family-" + person.family_uuid.String + "-child-" + person.uuid,
+                    id: "family-" + person.family_uuid + "-child-" + person.uuid,
                     type: "smoothstep",
-                    source: "family-" + person.family_uuid.String,
+                    source: "family-" + person.family_uuid,
                     target: "person-" + person.uuid,
                 })),
         ];
@@ -284,15 +284,15 @@ export function useEditor() {
             .filter((familyNode) => familyNode.type === "family")
             .filter((familyNode) => {
                 return [
-                    `person-${familyNode.data.person_1_id.String}`,
-                    `person-${familyNode.data.person_2_id.String}`,
+                    `person-${familyNode.data.person_1_id}`,
+                    `person-${familyNode.data.person_2_id}`,
                 ].includes(spouseNode.data.uuid);
             })
             .forEach((familyNode) => {
                 let searchNodeId =
-                    spouseNode.data.uuid === familyNode.data.person_1_id.String
-                        ? familyNode.data.person_2_id.String
-                        : familyNode.data.person_1_id.String;
+                    spouseNode.data.uuid === familyNode.data.person_1_id
+                        ? familyNode.data.person_2_id
+                        : familyNode.data.person_1_id;
 
                 let partnerNode = nodes.value.find(
                     (partnerNode) =>

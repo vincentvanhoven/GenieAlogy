@@ -3,7 +3,6 @@ package seeders
 import (
 	"GenieAlogy/models"
 	"GenieAlogy/repositories"
-	"database/sql"
 	"fmt"
 	"log"
 	"strings"
@@ -22,13 +21,13 @@ func RunFamilySeeder() {
 	families := []models.Family{
 		{
 			uuid.New().String(),
-			sql.NullString{grouped["male"][0].Uuid, true},
-			sql.NullString{grouped["female"][0].Uuid, true},
+			ptr(grouped["male"][0].Uuid),
+			ptr(grouped["female"][0].Uuid),
 		},
 		{
 			uuid.New().String(),
-			sql.NullString{grouped["male"][1].Uuid, true},
-			sql.NullString{grouped["female"][1].Uuid, true},
+			ptr(grouped["male"][1].Uuid),
+			ptr(grouped["female"][1].Uuid),
 		},
 	}
 
