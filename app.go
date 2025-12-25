@@ -3,11 +3,15 @@ package main
 import (
 	"GenieAlogy/repositories"
 	"context"
+	"errors"
 	"log"
 
 	"GenieAlogy/models"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"modernc.org/sqlite"
+	sqlite3 "modernc.org/sqlite/lib"
+	//"modernc.org/sqlite/lib"
 )
 
 const GENIEALOGY_VERSION = "0.0.1"
@@ -79,10 +83,18 @@ func (a *App) SaveFile(saveFile models.SaveFile) error {
 	//	return err
 	//}
 
+	var sqliteErr *sqlite.Error
+
 	for _, person := range saveFile.People {
 		err := repositories.PersonRepo.Create(person)
 
-		if err != nil {
+		if err != nil && errors.As(err, &sqliteErr) && sqliteErr.Code() == sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY {
+			err := repositories.PersonRepo.Update(person)
+
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else if err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -90,7 +102,13 @@ func (a *App) SaveFile(saveFile models.SaveFile) error {
 	for _, family := range saveFile.Families {
 		err := repositories.FamilyRepo.Create(family)
 
-		if err != nil {
+		if err != nil && errors.As(err, &sqliteErr) && sqliteErr.Code() == sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY {
+			err := repositories.FamilyRepo.Update(family)
+
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else if err != nil {
 			log.Fatal(err)
 		}
 	}
