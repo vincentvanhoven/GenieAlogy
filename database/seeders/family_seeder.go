@@ -3,9 +3,7 @@ package seeders
 import (
 	"GenieAlogy/models"
 	"GenieAlogy/repositories"
-	"fmt"
 	"log"
-	"strings"
 
 	"github.com/google/uuid"
 )
@@ -31,21 +29,10 @@ func RunFamilySeeder() {
 		},
 	}
 
-	var placeholders []string
-	var args []interface{}
-
 	for _, f := range families {
-		placeholders = append(placeholders, "(?, ?, ?)")
-		args = append(args, f.Uuid, f.Person1Uuid, f.Person2Uuid)
-	}
-
-	query := fmt.Sprintf(
-		`INSERT INTO families (uuid, person_1_uuid, person_2_uuid) VALUES %s`,
-		strings.Join(placeholders, ", "),
-	)
-
-	_, err := repositories.DatabaseRepo.DB.Exec(query, args...)
-	if err != nil {
-		log.Fatal(err)
+		err := repositories.FamilyRepo.Create(f)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
