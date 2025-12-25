@@ -16,6 +16,8 @@ jobs:
         with:
           go-version: 1.24.0
       - name: Run tests
+        # The application tries to embed al files under frontend/dist, and fails if there are none
         run: |
           mkdir -p frontend/dist
+          touch frontend/dist/.gitignore
           go test -v ./...
