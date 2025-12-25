@@ -8,4 +8,4 @@ frontend/wailsjs
 dist
 
 # Files
-test-database.geniealogy
+*.geniealogy
