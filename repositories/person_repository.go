@@ -10,17 +10,33 @@ type PersonRepository struct {
 var PersonRepo = &PersonRepository{}
 
 func (repo *PersonRepository) Create(p models.Person) error {
-	_, err := DatabaseRepo.DB.Exec(
-		`
-			INSERT INTO people (
+	// Open transaction
+	transaction, err := DatabaseRepo.DB.Begin()
+	if err != nil {
+		return err
+	}
+
+	// Attempt the execution of the prepared statement
+	_, err = transaction.Exec(
+		`INSERT INTO people (
 				uuid, sex, firstname, lastname, birthdate, birthplace, family_uuid, position_x, position_y
 			)
-         	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-		`,
+         	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		p.Uuid, p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyUuid, p.Position.X, p.Position.Y,
 	)
 
-	return err
+	// Rollback if anything went wrong
+	if err != nil {
+		rollbackerr := transaction.Rollback()
+		if rollbackerr != nil {
+			return rollbackerr
+		}
+
+		return err
+	}
+
+	// All went well, commit the transaction (this may return an error)
+	return transaction.Commit()
 }
 
 func (repo *PersonRepository) Fetch(uuid string) (*models.Person, error) {
@@ -76,7 +92,14 @@ func (repo *PersonRepository) FetchAll() ([]models.Person, error) {
 }
 
 func (repo *PersonRepository) Update(p models.Person) error {
-	_, err := DatabaseRepo.DB.Exec(
+	// Open transaction
+	transaction, err := DatabaseRepo.DB.Begin()
+	if err != nil {
+		return err
+	}
+
+	// Attempt the execution of the prepared statement
+	_, err = transaction.Exec(
 		`
 			UPDATE people
 			SET sex=?, firstname=?, lastname=?, birthdate=?, birthplace=?, family_uuid=?, profile_picture=?, position_x=?, position_y=?
@@ -85,7 +108,18 @@ func (repo *PersonRepository) Update(p models.Person) error {
 		p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyUuid, p.ProfilePicture, p.Position.X, p.Position.Y, p.Uuid, p.Uuid,
 	)
 
-	return err
+	// Rollback if anything went wrong
+	if err != nil {
+		rollbackerr := transaction.Rollback()
+		if rollbackerr != nil {
+			return rollbackerr
+		}
+
+		return err
+	}
+
+	// All went well, commit the transaction (this may return an error)
+	return transaction.Commit()
 }
 
 func (repo *PersonRepository) Delete(uuid string) error {

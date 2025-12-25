@@ -9,15 +9,30 @@ type FamilyRepository struct{}
 var FamilyRepo = &FamilyRepository{}
 
 func (repo *FamilyRepository) Create(f models.Family) error {
-	_, err := DatabaseRepo.DB.Exec(
-		`
-			INSERT INTO families (uuid, person_1_uuid, person_2_uuid)
-         	VALUES (?, ?, ?)
-		`,
+	// Open transaction
+	transaction, err := DatabaseRepo.DB.Begin()
+	if err != nil {
+		return err
+	}
+
+	// Attempt the execution of the prepared statement
+	_, err = transaction.Exec(
+		`INSERT INTO families (uuid, person_1_uuid, person_2_uuid) VALUES (?, ?, ?)`,
 		f.Uuid, f.Person1Uuid, f.Person2Uuid,
 	)
 
-	return err
+	// Rollback if anything went wrong
+	if err != nil {
+		rollbackerr := transaction.Rollback()
+		if rollbackerr != nil {
+			return rollbackerr
+		}
+
+		return err
+	}
+
+	// All went well, commit the transaction (this may return an error)
+	return transaction.Commit()
 }
 
 func (repo *FamilyRepository) Fetch(uuid string) (*models.Family, error) {
@@ -67,23 +82,52 @@ func (repo *FamilyRepository) FetchAll() ([]models.Family, error) {
 }
 
 func (repo *FamilyRepository) Update(f models.Family) error {
-	_, err := DatabaseRepo.DB.Exec(
-		`
-			UPDATE families
-			SET person_1_uuid=?, person_2_uuid=?
-			WHERE uuid=?
-		`,
+	// Open transaction
+	transaction, err := DatabaseRepo.DB.Begin()
+	if err != nil {
+		return err
+	}
+
+	// Attempt the execution of the prepared statement
+	_, err = transaction.Exec(
+		`UPDATE families SET person_1_uuid = ?, person_2_uuid = ? WHERE uuid = ?`,
 		f.Person1Uuid, f.Person2Uuid, f.Uuid,
 	)
 
-	return err
+	// Rollback if anything went wrong
+	if err != nil {
+		rollbackerr := transaction.Rollback()
+		if rollbackerr != nil {
+			return rollbackerr
+		}
+
+		return err
+	}
+
+	// All went well, commit the transaction (this may return an error)
+	return transaction.Commit()
 }
 
 func (repo *FamilyRepository) Delete(uuid string) error {
-	_, err := DatabaseRepo.DB.Exec(
+	transaction, err := DatabaseRepo.DB.Begin()
+	if err != nil {
+		return err
+	}
+
+	_, err = transaction.Exec(
 		`DELETE FROM families WHERE uuid=?`,
 		uuid,
 	)
 
-	return err
+	if err != nil {
+		rollbackerr := transaction.Rollback()
+		if rollbackerr != nil {
+			return rollbackerr
+		}
+
+		return err
+	}
+
+	// All went well, commit the transaction (this may return an error)
+	return transaction.Commit()
 }
