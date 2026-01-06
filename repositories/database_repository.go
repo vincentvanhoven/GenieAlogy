@@ -48,6 +48,9 @@ func (repo *DatabaseRepository) Fetch(filePath string) error {
 		return err
 	}
 
+	db.SetMaxOpenConns(1)
+	db.SetMaxIdleConns(1)
+	
 	repo.DB = db
 	return nil
 }
