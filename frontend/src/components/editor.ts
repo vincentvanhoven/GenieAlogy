@@ -80,14 +80,14 @@ export function useEditor() {
             ...dereffedSaveFile.people.map((person) => ({
                 id: "person-" + person.uuid,
                 type: "person",
-                position: person.position,
+                position: {x: person.position_x, y: person.position_y},
                 data: person,
             })),
             ...dereffedSaveFile.families.map((family) => ({
                 id: "family-" + family.uuid,
                 type: "family",
                 position: { x: 0, y: 0 },
-                draggable: false,
+                // draggable: false,
                 data: family,
             })),
         ];
@@ -365,6 +365,15 @@ export function useEditor() {
             updateNode(node.id, (node) => ({
                 position: newPosition,
             }));
+
+
+            // TODO: ref this better
+            let person = saveFile.value?.people.find(p => p.uuid == node.data.uuid);
+
+            if(person) {
+                person.position_x = newPosition.x;
+                person.position_y = newPosition.y;
+            }
         }
     }
 

@@ -19,7 +19,8 @@ func RunPeopleSeeder() {
 			Strptr("New York"),
 			nil,
 			nil,
-			models.Position{X: 0, Y: 0},
+			0,
+			0,
 		},
 		{
 			uuid.New().String(),
@@ -30,7 +31,8 @@ func RunPeopleSeeder() {
 			Strptr("New York"),
 			nil,
 			nil,
-			models.Position{X: 0, Y: 0},
+			0,
+			0,
 		},
 		{
 			uuid.New().String(),
@@ -41,7 +43,8 @@ func RunPeopleSeeder() {
 			Strptr("New York"),
 			nil,
 			nil,
-			models.Position{X: 0, Y: 0},
+			0,
+			0,
 		},
 		{
 			uuid.New().String(),
@@ -52,7 +55,8 @@ func RunPeopleSeeder() {
 			Strptr("New York"),
 			nil,
 			nil,
-			models.Position{X: 0, Y: 0},
+			0,
+			0,
 		},
 		{
 			uuid.New().String(),
@@ -63,7 +67,8 @@ func RunPeopleSeeder() {
 			Strptr("New York"),
 			nil,
 			nil,
-			models.Position{X: 0, Y: 0},
+			0,
+			0,
 		},
 		{
 			uuid.New().String(),
@@ -74,7 +79,8 @@ func RunPeopleSeeder() {
 			Strptr("New York"),
 			nil,
 			nil,
-			models.Position{X: 0, Y: 0},
+			0,
+			0,
 		},
 	}
 

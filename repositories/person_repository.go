@@ -22,7 +22,7 @@ func (repo *PersonRepository) Create(p models.Person) error {
 				uuid, sex, firstname, lastname, birthdate, birthplace, family_uuid, position_x, position_y
 			)
          	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		p.Uuid, p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyUuid, p.Position.X, p.Position.Y,
+		p.Uuid, p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyUuid, p.PositionX, p.PositionY,
 	)
 
 	// Rollback if anything went wrong
@@ -44,7 +44,7 @@ func (repo *PersonRepository) Fetch(uuid string) (*models.Person, error) {
 
 	err := DatabaseRepo.DB.
 		QueryRow(`SELECT * FROM people WHERE uuid = ?`, uuid).
-		Scan(&p.Uuid, &p.Sex, &p.Firstname, &p.Lastname, &p.Birthdate, &p.Birthplace, &p.FamilyUuid, &p.ProfilePicture, &p.Position.X, &p.Position.Y)
+		Scan(&p.Uuid, &p.Sex, &p.Firstname, &p.Lastname, &p.Birthdate, &p.Birthplace, &p.FamilyUuid, &p.ProfilePicture, &p.PositionX, &p.PositionY)
 
 	if err != nil {
 		return nil, err
@@ -73,8 +73,8 @@ func (repo *PersonRepository) FetchAll() ([]models.Person, error) {
 			&row.Birthplace,
 			&row.FamilyUuid,
 			&row.ProfilePicture,
-			&row.Position.X,
-			&row.Position.Y,
+			&row.PositionX,
+			&row.PositionY,
 		)
 
 		if err != nil {
@@ -105,7 +105,7 @@ func (repo *PersonRepository) Update(p models.Person) error {
 			SET sex=?, firstname=?, lastname=?, birthdate=?, birthplace=?, family_uuid=?, profile_picture=?, position_x=?, position_y=?
 			WHERE uuid=?
 		`,
-		p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyUuid, p.ProfilePicture, p.Position.X, p.Position.Y, p.Uuid, p.Uuid,
+		p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyUuid, p.ProfilePicture, p.PositionX, p.PositionY, p.Uuid, p.Uuid,
 	)
 
 	// Rollback if anything went wrong
