@@ -1,8 +1,8 @@
-name: Run Prettier and commited changes
+name: Run Prettier and commit changes
 
 on:
   push:
-    branches: [main, initial-setup]
+    branches: [develop]
   pull_request:
 
 permissions:
@@ -10,13 +10,16 @@ permissions:
 
 jobs:
   prettier:
+    name: "Run Prettier and commit changes"
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+      - uses: actions/setup-node@v6
         with:
           node-version: 20
       - run: npm ci

@@ -1,13 +1,20 @@
 package main
 
 import (
+	"GenieAlogy/repositories"
 	"context"
-	"encoding/json"
-	"fmt"
-	"os"
+	"errors"
+	"log"
+
+	"GenieAlogy/models"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"modernc.org/sqlite"
+	sqlite3 "modernc.org/sqlite/lib"
+	//"modernc.org/sqlite/lib"
 )
+
+const GENIEALOGY_VERSION = "0.0.1"
 
 type App struct {
 	ctx          context.Context
@@ -22,7 +29,7 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
-func (a *App) LoadFile() (*SaveFile, error) {
+func (a *App) LoadFile() (*models.SaveFile, error) {
 	// Open file picker
 	path, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
 		Filters: []runtime.FileFilter{
@@ -36,20 +43,24 @@ func (a *App) LoadFile() (*SaveFile, error) {
 		return nil, err
 	}
 
-	// Create handle for picked file
-	file, err := os.Open(path)
+	err = repositories.DatabaseRepo.Fetch(path)
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
 
-	defer file.Close()
+	families, err := repositories.FamilyRepo.FetchAll()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	// Read & JSON-decode the picked file's contents
-	var saveFile SaveFile
-	decoder := json.NewDecoder(file)
-	decoder.DisallowUnknownFields()
-	if err := decoder.Decode(&saveFile); err != nil {
-		return nil, err
+	people, err := repositories.PersonRepo.FetchAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	saveFile := models.SaveFile{
+		people,
+		families,
 	}
 
 	// Keep track of open file/project path
@@ -58,20 +69,35 @@ func (a *App) LoadFile() (*SaveFile, error) {
 	return &saveFile, nil
 }
 
-func (a *App) SaveFile(saveFile SaveFile) error {
-	// Create handle for picked file
-	file, err := os.Create(a.openFilePath)
-	if err != nil {
-		return err
+func (a *App) SaveFile(saveFile models.SaveFile) error {
+	var sqliteErr *sqlite.Error
+
+	for _, person := range saveFile.People {
+		err := repositories.PersonRepo.Create(person)
+
+		if err != nil && errors.As(err, &sqliteErr) && sqliteErr.Code() == sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY {
+			err := repositories.PersonRepo.Update(person)
+
+			if err != nil {
+				log.Fatal("SaveFile -> person.update", err)
+			}
+		} else if err != nil {
+			log.Fatal("SaveFile -> person.create", err)
+		}
 	}
 
-	defer file.Close()
+	for _, family := range saveFile.Families {
+		err := repositories.FamilyRepo.Create(family)
 
-	// JSON-encode & write the savefile to the open file/project path
-	encoder := json.NewEncoder(file)
-	if err := encoder.Encode(saveFile); err != nil {
-		fmt.Println(err)
-		return err
+		if err != nil && errors.As(err, &sqliteErr) && sqliteErr.Code() == sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY {
+			err := repositories.FamilyRepo.Update(family)
+
+			if err != nil {
+				log.Fatal("SaveFile -> family.update", err)
+			}
+		} else if err != nil {
+			log.Fatal("SaveFile -> family.create", err)
+		}
 	}
 
 	return nil
