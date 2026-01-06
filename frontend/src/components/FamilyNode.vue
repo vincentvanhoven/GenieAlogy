@@ -1,6 +1,7 @@
 <template>
     <div
-        class="vue-flow__node-default node-root flex justify-center items-center !bg-gray-200 !rounded-full !border !p-1.5"
+        class="vue-flow__node-default node-root flex justify-center items-center
+            !bg-gray-200 !rounded-full !border !p-1.5"
     >
         <Handle type="target" :position="Position.Left" id="left" />
         <Handle type="target" :position="Position.Right" id="right" />

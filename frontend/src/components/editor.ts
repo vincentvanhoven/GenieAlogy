@@ -1,5 +1,11 @@
 import { computed, ComputedRef, nextTick, Ref, ref, toRaw } from "vue";
-import { Node, Edge, useVueFlow, NodeSelectionChange, MarkerType } from "@vue-flow/core";
+import {
+    Node,
+    Edge,
+    useVueFlow,
+    NodeSelectionChange,
+    MarkerType,
+} from "@vue-flow/core";
 import { SaveFile as DoSaveFile } from "../../wailsjs/go/main/App";
 import { models } from "../../wailsjs/go/models";
 import SaveFile = models.SaveFile;
@@ -60,7 +66,10 @@ export function useEditor() {
             saveConfiguration();
         });
 
-        loadConfiguration({people: <People[]>[], families: <Family[]>[]} as SaveFile);
+        loadConfiguration({
+            people: <People[]>[],
+            families: <Family[]>[],
+        } as SaveFile);
     }
 
     function loadConfiguration(JSON: SaveFile) {
@@ -70,7 +79,7 @@ export function useEditor() {
             ...saveFile.value.people.map((person) => ({
                 id: "person-" + person.uuid,
                 type: "person",
-                position: {x: person.position_x, y: person.position_y},
+                position: { x: person.position_x, y: person.position_y },
                 data: person,
             })),
             ...saveFile.value.families.map((family) => ({
@@ -112,13 +121,17 @@ export function useEditor() {
             ...saveFile.value.people
                 .filter((person) => person.family_uuid)
                 .map((person) => ({
-                    id: "family-" + person.family_uuid + "-child-" + person.uuid,
+                    id:
+                        "family-" +
+                        person.family_uuid +
+                        "-child-" +
+                        person.uuid,
                     type: "smoothstep",
                     source: "family-" + person.family_uuid,
                     target: "person-" + person.uuid,
                     markerEnd: {
                         type: MarkerType.ArrowClosed,
-                        color: 'black',
+                        color: "black",
                     },
                 })),
         ];
@@ -130,7 +143,11 @@ export function useEditor() {
 
     function handleNodesSelectionDrag({ node, event }: any) {
         getSelectedNodes.value.forEach((selectedNode) => {
-            console.log(selectedNode.data.firstname, selectedNode.position.x, selectedNode.position.y)
+            console.log(
+                selectedNode.data.firstname,
+                selectedNode.position.x,
+                selectedNode.position.y,
+            );
 
             selectedNode.data.position_x = selectedNode.position.x;
             selectedNode.data.position_y = selectedNode.position.y;

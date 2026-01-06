@@ -24,10 +24,10 @@
             :class="{ invisible: !connectedHandles.right }"
         />
 
-        <div class="
-            h-full flex justify-center items-center
-            text-sm font-semibold bg-transparent
-        ">
+        <div
+            class="h-full flex justify-center items-center text-sm font-semibold
+                bg-transparent"
+        >
             {{ data.firstname }} {{ data.lastname }}
         </div>
     </div>
@@ -51,13 +51,13 @@
             [edge.source, edge.target].includes(props.id),
         );
 
-        let hasTargetEdge = ownEdges.some(edge => edge.target == props.id);
-        let hasSourceEdge = ownEdges.some(edge => edge.source == props.id)
+        let hasTargetEdge = ownEdges.some((edge) => edge.target == props.id);
+        let hasSourceEdge = ownEdges.some((edge) => edge.source == props.id);
 
         return {
             top: hasTargetEdge ?? false,
-            left: (hasSourceEdge && props.data.sex === 'female') ?? false,
-            right: (hasSourceEdge && props.data.sex === 'male') ?? false,
+            left: (hasSourceEdge && props.data.sex === "female") ?? false,
+            right: (hasSourceEdge && props.data.sex === "male") ?? false,
         };
     });
 

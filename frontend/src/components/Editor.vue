@@ -25,7 +25,7 @@
                     <FamilyNode v-bind="props" />
                 </template>
 
-                <Background variant="lines" :gap="16"/>
+                <Background variant="lines" :gap="16" />
             </VueFlow>
         </div>
 

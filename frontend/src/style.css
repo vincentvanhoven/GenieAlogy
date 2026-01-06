@@ -10,7 +10,8 @@
     stroke: #000000;
 }
 
-.vue-flow__node-person.selected, .vue-flow__node-family.selected {
+.vue-flow__node-person.selected,
+.vue-flow__node-family.selected {
     & > .node-root {
         @apply shadow-xl outline-2 outline-blue-400;
         @apply focus:outline-2 focus:outline-blue-400;
