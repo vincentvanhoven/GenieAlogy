@@ -25,9 +25,10 @@
         />
 
         <div class="
-            h-full flex justify-center items-center font-semibold bg-transparent
+            h-full flex justify-center items-center
+            text-sm font-semibold bg-transparent
         ">
-            {{ data.firstname }} {{ data.lastname }} {{data.sex}}
+            {{ data.firstname }} {{ data.lastname }}
         </div>
     </div>
 </template>
@@ -68,7 +69,7 @@
 <style lang="scss" scoped>
     .node-root {
         padding: 0 !important;
-        width: 144px;
+        width: 256px;
         height: 64px;
     }
 </style>

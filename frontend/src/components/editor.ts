@@ -1,5 +1,5 @@
 import { computed, ComputedRef, nextTick, Ref, ref, toRaw } from "vue";
-import { Node, Edge, useVueFlow, NodeSelectionChange } from "@vue-flow/core";
+import { Node, Edge, useVueFlow, NodeSelectionChange, MarkerType } from "@vue-flow/core";
 import { SaveFile as DoSaveFile } from "../../wailsjs/go/main/App";
 import { models } from "../../wailsjs/go/models";
 import SaveFile = models.SaveFile;
@@ -116,6 +116,10 @@ export function useEditor() {
                     type: "smoothstep",
                     source: "family-" + person.family_uuid,
                     target: "person-" + person.uuid,
+                    markerEnd: {
+                        type: MarkerType.ArrowClosed,
+                        color: 'black',
+                    },
                 })),
         ];
     }
