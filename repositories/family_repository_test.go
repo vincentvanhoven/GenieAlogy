@@ -33,6 +33,8 @@ func TestFamilyRepository_Create_Fetch(t *testing.T) {
 		uuid.New().String(),
 		seeders.Strptr(uuid.New().String()),
 		seeders.Strptr(uuid.New().String()),
+		0,
+		0,
 	}
 
 	err := repositories.FamilyRepo.Create(familyCreateData)
@@ -57,6 +59,8 @@ func TestFamilyRepository_Update_Fetch(t *testing.T) {
 		uuid.New().String(),
 		seeders.Strptr(uuid.New().String()),
 		seeders.Strptr(uuid.New().String()),
+		0,
+		0,
 	}
 
 	err := repositories.FamilyRepo.Create(familyCreateData)
@@ -69,6 +73,8 @@ func TestFamilyRepository_Update_Fetch(t *testing.T) {
 		familyCreateData.Uuid,
 		seeders.Strptr(uuid.New().String()),
 		seeders.Strptr(uuid.New().String()),
+		0,
+		0,
 	}
 
 	err = repositories.FamilyRepo.Update(familyUpdateData)
@@ -93,6 +99,8 @@ func TestFamilyRepository_Delete_Fetch(t *testing.T) {
 		uuid.New().String(),
 		seeders.Strptr(uuid.New().String()),
 		seeders.Strptr(uuid.New().String()),
+		0,
+		0,
 	}
 
 	err := repositories.FamilyRepo.Create(familyCreateData)

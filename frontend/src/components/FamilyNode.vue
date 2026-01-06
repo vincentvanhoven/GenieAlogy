@@ -1,7 +1,6 @@
 <template>
     <div
-        class="vue-flow__node-default node-root bg-gray-200 !rounded-full
-            !border-2 flex justify-center items-center !p-[3px]"
+        class="vue-flow__node-default node-root flex justify-center items-center !bg-gray-200 !rounded-full !border !p-1.5"
     >
         <Handle type="target" :position="Position.Left" id="left" />
         <Handle type="target" :position="Position.Right" id="right" />
@@ -47,7 +46,7 @@
 
 <style lang="scss" scoped>
     .node-root {
-        width: 25px;
-        height: 25px;
+        width: 32px;
+        height: 32px;
     }
 </style>

@@ -11,8 +11,11 @@
                 v-model:nodes="editor.nodes.value"
                 v-model:edges="editor.edges.value"
                 @node-drag="editor.handleNodesSelectionDrag"
-                @node-drag-start="editor.handleNodesSelectionDragStart"
                 @move="editor.onMove"
+                :snap-grid="[16, 16]"
+                :snap-to-grid="true"
+                :min-zoom="0.01"
+                :max-zoom="1"
             >
                 <template #node-person="props">
                     <PersonNode v-bind="props" />
@@ -21,6 +24,8 @@
                 <template #node-family="props">
                     <FamilyNode v-bind="props" />
                 </template>
+
+                <Background variant="lines" :gap="16"/>
             </VueFlow>
         </div>
 
@@ -35,13 +40,11 @@
     import { onMounted, Ref, ref } from "vue";
     import { useEditor } from "./editor";
     import Sidebar from "./Sidebar.vue";
+    import { Background } from "@vue-flow/background";
 
     const editor = useEditor();
     const gridCanvas: Ref<HTMLCanvasElement | null> = ref(null);
 
     // Event listeners
-    onMounted(() => {
-        editor.init(gridCanvas.value!);
-        editor.drawGrid();
-    });
+    onMounted(() => editor.init(gridCanvas.value!));
 </script>

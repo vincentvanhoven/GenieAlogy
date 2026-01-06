@@ -17,8 +17,8 @@ func (repo *FamilyRepository) Create(f models.Family) error {
 
 	// Attempt the execution of the prepared statement
 	_, err = transaction.Exec(
-		`INSERT INTO families (uuid, person_1_uuid, person_2_uuid) VALUES (?, ?, ?)`,
-		f.Uuid, f.Person1Uuid, f.Person2Uuid,
+		`INSERT INTO families (uuid, person_1_uuid, person_2_uuid, position_x, position_y) VALUES (?, ?, ?, ?, ?)`,
+		f.Uuid, f.Person1Uuid, f.Person2Uuid, f.PositionX, f.PositionY,
 	)
 
 	// Rollback if anything went wrong
@@ -40,12 +40,12 @@ func (repo *FamilyRepository) Fetch(uuid string) (*models.Family, error) {
 
 	err := DatabaseRepo.DB.QueryRow(
 		`SELECT
-    		uuid, person_1_uuid, person_2_uuid
+    		uuid, person_1_uuid, person_2_uuid, position_x, position_y
          	FROM families
          	WHERE uuid = ?
 		`,
 		uuid,
-	).Scan(&f.Uuid, &f.Person1Uuid, &f.Person2Uuid)
+	).Scan(&f.Uuid, &f.Person1Uuid, &f.Person2Uuid, &f.PositionX, &f.PositionY)
 
 	if err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func (repo *FamilyRepository) FetchAll() ([]models.Family, error) {
 
 	for rows.Next() {
 		var row models.Family
-		err := rows.Scan(&row.Uuid, &row.Person1Uuid, &row.Person2Uuid)
+		err := rows.Scan(&row.Uuid, &row.Person1Uuid, &row.Person2Uuid, &row.PositionX, &row.PositionY)
 
 		if err != nil {
 			return f, err
@@ -90,8 +90,8 @@ func (repo *FamilyRepository) Update(f models.Family) error {
 
 	// Attempt the execution of the prepared statement
 	_, err = transaction.Exec(
-		`UPDATE families SET person_1_uuid = ?, person_2_uuid = ? WHERE uuid = ?`,
-		f.Person1Uuid, f.Person2Uuid, f.Uuid,
+		`UPDATE families SET person_1_uuid = ?, person_2_uuid = ?, position_x = ?, position_y = ? WHERE uuid = ?`,
+		f.Person1Uuid, f.Person2Uuid, f.PositionX, f.PositionY, f.Uuid,
 	)
 
 	// Rollback if anything went wrong

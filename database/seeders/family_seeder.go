@@ -21,11 +21,15 @@ func RunFamilySeeder() {
 			uuid.New().String(),
 			Strptr(grouped["male"][0].Uuid),
 			Strptr(grouped["female"][0].Uuid),
+			0,
+			0,
 		},
 		{
 			uuid.New().String(),
 			Strptr(grouped["male"][1].Uuid),
 			Strptr(grouped["female"][1].Uuid),
+			0,
+			0,
 		},
 	}
 

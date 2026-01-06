@@ -6,28 +6,28 @@
         <Handle
             type="target"
             :position="Position.Top"
-            id="top"
             :class="{ invisible: !connectedHandles.top }"
         />
+
         <Handle
+            v-if="data.sex === 'female'"
             type="source"
             :position="Position.Left"
-            id="left"
             :class="{ invisible: !connectedHandles.left }"
         />
+
         <Handle
+            v-else
             type="source"
             :position="Position.Right"
             id="right"
             :class="{ invisible: !connectedHandles.right }"
         />
 
-        <div class="aspect-square bg-white border-b">
-            <img :src="profilePicture" alt="profile picture" />
-        </div>
-
-        <div class="bg-transparent">
-            {{ data.firstname }} {{ data.lastname }}
+        <div class="
+            h-full flex justify-center items-center font-semibold bg-transparent
+        ">
+            {{ data.firstname }} {{ data.lastname }} {{data.sex}}
         </div>
     </div>
 </template>
@@ -50,11 +50,13 @@
             [edge.source, edge.target].includes(props.id),
         );
 
+        let hasTargetEdge = ownEdges.some(edge => edge.target == props.id);
+        let hasSourceEdge = ownEdges.some(edge => edge.source == props.id)
+
         return {
-            top: ownEdges.some((edge) => edge.target == props.id) ?? false,
-            left: ownEdges.some((edge) => edge.sourceHandle == "left") ?? false,
-            right:
-                ownEdges.some((edge) => edge.sourceHandle == "right") ?? false,
+            top: hasTargetEdge ?? false,
+            left: (hasSourceEdge && props.data.sex === 'female') ?? false,
+            right: (hasSourceEdge && props.data.sex === 'male') ?? false,
         };
     });
 
@@ -66,7 +68,7 @@
 <style lang="scss" scoped>
     .node-root {
         padding: 0 !important;
-        width: 100px;
-        height: 150px;
+        width: 144px;
+        height: 64px;
     }
 </style>
