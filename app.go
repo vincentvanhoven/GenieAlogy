@@ -70,19 +70,6 @@ func (a *App) LoadFile() (*models.SaveFile, error) {
 }
 
 func (a *App) SaveFile(saveFile models.SaveFile) error {
-	// Open file picker
-	//path, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
-	//	Filters: []runtime.FileFilter{
-	//		{
-	//			DisplayName: "Geniealogy files",
-	//			Pattern:     "*.geniealogy",
-	//		},
-	//	},
-	//})
-	//if err != nil {
-	//	return err
-	//}
-
 	var sqliteErr *sqlite.Error
 
 	for _, person := range saveFile.People {
@@ -92,10 +79,10 @@ func (a *App) SaveFile(saveFile models.SaveFile) error {
 			err := repositories.PersonRepo.Update(person)
 
 			if err != nil {
-				log.Fatal(err)
+				log.Fatal("SaveFile -> person.update", err)
 			}
 		} else if err != nil {
-			log.Fatal(err)
+			log.Fatal("SaveFile -> person.create", err)
 		}
 	}
 
@@ -106,10 +93,10 @@ func (a *App) SaveFile(saveFile models.SaveFile) error {
 			err := repositories.FamilyRepo.Update(family)
 
 			if err != nil {
-				log.Fatal(err)
+				log.Fatal("SaveFile -> family.update", err)
 			}
 		} else if err != nil {
-			log.Fatal(err)
+			log.Fatal("SaveFile -> family.create", err)
 		}
 	}
 
