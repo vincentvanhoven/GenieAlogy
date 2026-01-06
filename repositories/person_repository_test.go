@@ -37,7 +37,8 @@ func TestPersonRepository_Create_Fetch(t *testing.T) {
 		seeders.Strptr("New York"),
 		nil,
 		nil,
-		models.Position{X: 0, Y: 0},
+		0,
+		0,
 	}
 
 	err := repositories.PersonRepo.Create(personCreateData)
@@ -67,7 +68,8 @@ func TestPersonRepository_Update_Fetch(t *testing.T) {
 		seeders.Strptr("New York"),
 		nil,
 		nil,
-		models.Position{X: 0, Y: 0},
+		0,
+		0,
 	}
 
 	err := repositories.PersonRepo.Create(personCreateData)
@@ -85,7 +87,8 @@ func TestPersonRepository_Update_Fetch(t *testing.T) {
 		seeders.Strptr("Los Angeles"),
 		nil,
 		nil,
-		models.Position{X: 1, Y: 2},
+		1,
+		2,
 	}
 
 	err = repositories.PersonRepo.Update(personUpdateData)
@@ -115,7 +118,8 @@ func TestPersonRepository_Delete_Fetch(t *testing.T) {
 		seeders.Strptr("New York"),
 		nil,
 		nil,
-		models.Position{X: 0, Y: 0},
+		0,
+		0,
 	}
 
 	err := repositories.PersonRepo.Create(personCreateData)
