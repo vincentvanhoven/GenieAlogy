@@ -1,19 +1,16 @@
-# README
+# GenieAlogy
 
-## About
+**GenieAlogy** is a genealogy tool focused on ease-of-use. This is mostly accomplished by providing a visual interface
+that displays the entire family tree you're working on as a node system. The nodes in this system can be
+dragged-and-dropped freely to keep things neat.
 
-This is the official Wails Vue-TS template.
+## Features
 
-You can configure the project by editing `wails.json`. More information about the project settings can be found
-here: https://wails.io/docs/reference/project-config
+This will be filled in with the first major release (<u>v1.0.0</u>).
 
-## Live Development
+## Development
 
-To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
-server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
-and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
-to this in your browser, and you can call your Go code from devtools.
+Please note that this software is in active development, and stability is not a focus until the first major release
+(<u>v1.0.0</u>).
 
-## Building
-
-To build a redistributable, production mode package, use `wails build`.
+You can find upcoming features/bugfixes on the [Planning board](https://github.com/users/vincentvanhoven/projects/2).
