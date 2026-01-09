@@ -54,14 +54,14 @@
     const gridCanvas: Ref<HTMLCanvasElement | null> = ref(null);
     const showSavingMessage: Ref<boolean> = ref(false);
     const savingMessage: Ref<string | null> = ref(null);
-    const clearMessageTimeout: Ref<number|null> = ref(null);
+    const clearMessageTimeout: Ref<number | null> = ref(null);
 
     // Event listeners
     onMounted(() => editor.init(gridCanvas.value!));
 
     // Watchers
     watch(editor.isSaving, (value, oldValue) => {
-        if(clearMessageTimeout.value) {
+        if (clearMessageTimeout.value) {
             clearTimeout(clearMessageTimeout.value);
             clearMessageTimeout.value = null;
         }
@@ -74,7 +74,7 @@
             // If there was an update, and not currently saving, saving must have finished.
             savingMessage.value += " done!";
             clearMessageTimeout.value = window.setTimeout(
-                () => showSavingMessage.value = false,
+                () => (showSavingMessage.value = false),
                 1500,
             );
         }

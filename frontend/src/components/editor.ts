@@ -139,7 +139,7 @@ export function useEditor() {
 
     function saveSaveFile(): void {
         // Is a save is already in process, 'queue' another save and return
-        if(isSaving.value) {
+        if (isSaving.value) {
             queueSave.value = true;
             return;
         }
@@ -147,17 +147,16 @@ export function useEditor() {
         isSaving.value = true;
 
         // Send the possibly updated saveFile to the backend for saving
-        DoSaveFile({ ...saveFile.value } as SaveFile)
-            .finally(() => {
-                isSaving.value = false;
+        DoSaveFile({ ...saveFile.value } as SaveFile).finally(() => {
+            isSaving.value = false;
 
-                // If another save was attempted since the start of this one
-                if(queueSave.value) {
-                    // Reset the 'queue' var and save the saveFile again
-                    queueSave.value = false;
-                    saveSaveFile()
-                }
-            });
+            // If another save was attempted since the start of this one
+            if (queueSave.value) {
+                // Reset the 'queue' var and save the saveFile again
+                queueSave.value = false;
+                saveSaveFile();
+            }
+        });
     }
 
     function handleNodesSelectionDrag({ node, event }: any): void {
@@ -177,11 +176,11 @@ export function useEditor() {
         () => saveFile.value,
         (value, oldValue) => {
             // This check prevents saving immediately after loading a savefile.
-            if(value !== null && oldValue !== null) {
+            if (value !== null && oldValue !== null) {
                 saveSaveFile();
             }
         },
-        {deep: true},
+        { deep: true },
     );
 
     return {
