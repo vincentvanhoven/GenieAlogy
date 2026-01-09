@@ -27,6 +27,13 @@
 
                 <Background variant="lines" :gap="16" />
             </VueFlow>
+
+            <div
+                class="absolute left-3 bottom-2 transition-all duration-300"
+                :class="!!showSavingMessage ? 'opacity-100' : 'opacity-0'"
+            >
+                {{ savingMessage }}
+            </div>
         </div>
 
         <Sidebar :selected-node="editor.selectedNode.value" />
@@ -37,14 +44,39 @@
     import { VueFlow } from "@vue-flow/core";
     import PersonNode from "./PersonNode.vue";
     import FamilyNode from "./FamilyNode.vue";
-    import { onMounted, Ref, ref } from "vue";
+    import { onMounted, Ref, ref, watch } from "vue";
     import { useEditor } from "./editor";
     import Sidebar from "./Sidebar.vue";
     import { Background } from "@vue-flow/background";
 
+    // Data
     const editor = useEditor();
     const gridCanvas: Ref<HTMLCanvasElement | null> = ref(null);
+    const showSavingMessage: Ref<boolean> = ref(false);
+    const savingMessage: Ref<string | null> = ref(null);
+    const clearMessageTimeout: Ref<number | null> = ref(null);
 
     // Event listeners
     onMounted(() => editor.init(gridCanvas.value!));
+
+    // Watchers
+    watch(editor.isSaving, (value, oldValue) => {
+        if (clearMessageTimeout.value) {
+            clearTimeout(clearMessageTimeout.value);
+            clearMessageTimeout.value = null;
+        }
+
+        // If currently saving
+        if (value) {
+            savingMessage.value = "Autosaving...";
+            showSavingMessage.value = true;
+        } else {
+            // If there was an update, and not currently saving, saving must have finished.
+            savingMessage.value += " done!";
+            clearMessageTimeout.value = window.setTimeout(
+                () => (showSavingMessage.value = false),
+                1500,
+            );
+        }
+    });
 </script>
