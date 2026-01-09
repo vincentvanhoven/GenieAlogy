@@ -1,4 +1,4 @@
-import { computed, ComputedRef, nextTick, Ref, ref, toRaw } from "vue";
+import { computed, ComputedRef, nextTick, Ref, ref, toRaw, watch } from "vue";
 import {
     Node,
     Edge,
@@ -21,6 +21,8 @@ export function useEditor() {
     const selectedNodes = ref<Node[]>([]);
     const gridCanvas: Ref<HTMLCanvasElement | null> = ref(null);
     let offset = { x: 0, y: 0, zoom: 1 };
+    let queueSave: Ref<boolean> = ref(false);
+    let isSaving: Ref<boolean> = ref(false);
 
     // Composables
     const { getSelectedNodes, onNodesChange } = useVueFlow();
@@ -31,7 +33,7 @@ export function useEditor() {
     });
 
     // Methods
-    function init(htmlCanvasElement: HTMLCanvasElement) {
+    function init(htmlCanvasElement: HTMLCanvasElement): void {
         gridCanvas.value = htmlCanvasElement;
 
         // Event listeners
@@ -59,20 +61,18 @@ export function useEditor() {
         });
 
         EventsOn("onSaveFileLoaded", (saveFile: SaveFile) => {
-            loadConfiguration(saveFile);
+            loadSaveFile(saveFile);
         });
 
         EventsOn("onSaveRequested", () => {
-            saveConfiguration();
+            saveSaveFile();
         });
-
-        loadConfiguration({
-            people: <People[]>[],
-            families: <Family[]>[],
-        } as SaveFile);
     }
 
-    function loadConfiguration(JSON: SaveFile) {
+    function loadSaveFile(JSON: SaveFile): void {
+        // Setting the saveFile to null first helps the watcher to know not to
+        // autosave the savefile once.
+        saveFile.value = null;
         saveFile.value = JSON;
 
         nodes.value = [
@@ -137,28 +137,52 @@ export function useEditor() {
         ];
     }
 
-    function saveConfiguration() {
-        DoSaveFile({ ...saveFile.value } as SaveFile);
+    function saveSaveFile(): void {
+        // Is a save is already in process, 'queue' another save and return
+        if(isSaving.value) {
+            queueSave.value = true;
+            return;
+        }
+
+        isSaving.value = true;
+
+        // Send the possibly updated saveFile to the backend for saving
+        DoSaveFile({ ...saveFile.value } as SaveFile)
+            .finally(() => {
+                isSaving.value = false;
+
+                // If another save was attempted since the start of this one
+                if(queueSave.value) {
+                    // Reset the 'queue' var and save the saveFile again
+                    queueSave.value = false;
+                    saveSaveFile()
+                }
+            });
     }
 
-    function handleNodesSelectionDrag({ node, event }: any) {
+    function handleNodesSelectionDrag({ node, event }: any): void {
         getSelectedNodes.value.forEach((selectedNode) => {
-            console.log(
-                selectedNode.data.firstname,
-                selectedNode.position.x,
-                selectedNode.position.y,
-            );
-
             selectedNode.data.position_x = selectedNode.position.x;
             selectedNode.data.position_y = selectedNode.position.y;
         });
     }
 
-    function onMove({ event, flowTransform }: any) {
+    function onMove({ event, flowTransform }: any): void {
         offset.x = flowTransform.x;
         offset.y = flowTransform.y;
         offset.zoom = flowTransform.zoom;
     }
+
+    watch(
+        () => saveFile.value,
+        (value, oldValue) => {
+            // This check prevents saving immediately after loading a savefile.
+            if(value !== null && oldValue !== null) {
+                saveSaveFile();
+            }
+        },
+        {deep: true},
+    );
 
     return {
         nodes,
@@ -167,5 +191,6 @@ export function useEditor() {
         init,
         handleNodesSelectionDrag,
         onMove,
+        isSaving,
     };
 }
