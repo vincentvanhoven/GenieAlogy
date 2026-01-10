@@ -12,6 +12,7 @@ import SaveFile = models.SaveFile;
 import People = models.Person;
 import Family = models.Family;
 import { EventsOn } from "../../wailsjs/runtime";
+import Person = models.Person;
 
 export function useEditor() {
     // Data
@@ -137,27 +138,14 @@ export function useEditor() {
         ];
     }
 
-    function saveSaveFile(): void {
-        // Is a save is already in process, 'queue' another save and return
-        if (isSaving.value) {
-            queueSave.value = true;
-            return;
-        }
-
+    const saveSaveFile = debounce(() => {
         isSaving.value = true;
 
         // Send the possibly updated saveFile to the backend for saving
-        DoSaveFile({ ...saveFile.value } as SaveFile).finally(() => {
-            isSaving.value = false;
-
-            // If another save was attempted since the start of this one
-            if (queueSave.value) {
-                // Reset the 'queue' var and save the saveFile again
-                queueSave.value = false;
-                saveSaveFile();
-            }
-        });
-    }
+        DoSaveFile({ ...saveFile.value } as SaveFile).finally(
+            () => (isSaving.value = false),
+        );
+    }, 1000);
 
     function handleNodesSelectionDrag({ node, event }: any): void {
         getSelectedNodes.value.forEach((selectedNode) => {
@@ -170,6 +158,20 @@ export function useEditor() {
         offset.x = flowTransform.x;
         offset.y = flowTransform.y;
         offset.zoom = flowTransform.zoom;
+    }
+
+    function debounce<T extends (...args: any[]) => any>(
+        func: T,
+        delay: number = 1000,
+    ): (...args: Parameters<T>) => void {
+        let timer: ReturnType<typeof setTimeout>;
+
+        return (...args: Parameters<T>) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                func(...args);
+            }, delay);
+        };
     }
 
     watch(
