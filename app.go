@@ -3,15 +3,11 @@ package main
 import (
 	"GenieAlogy/repositories"
 	"context"
-	"errors"
 	"log"
 
 	"GenieAlogy/models"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
-	"modernc.org/sqlite"
-	sqlite3 "modernc.org/sqlite/lib"
-	//"modernc.org/sqlite/lib"
 )
 
 const GENIEALOGY_VERSION = "0.0.1"
@@ -39,8 +35,14 @@ func (a *App) LoadFile() (*models.SaveFile, error) {
 			},
 		},
 	})
+
 	if err != nil {
 		return nil, err
+	}
+
+	// Empty response if no file was chosen
+	if path == "" {
+		return nil, nil
 	}
 
 	err = repositories.DatabaseRepo.Fetch(path)
@@ -70,33 +72,35 @@ func (a *App) LoadFile() (*models.SaveFile, error) {
 }
 
 func (a *App) SaveFile(saveFile models.SaveFile) error {
-	var sqliteErr *sqlite.Error
-
 	for _, person := range saveFile.People {
-		err := repositories.PersonRepo.Create(person)
+		if person.Id == nil {
+			_, err := repositories.PersonRepo.Create(person)
 
-		if err != nil && errors.As(err, &sqliteErr) && sqliteErr.Code() == sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY {
+			if err != nil {
+				log.Fatal("SaveFile -> person.create", err)
+			}
+		} else {
 			err := repositories.PersonRepo.Update(person)
 
 			if err != nil {
 				log.Fatal("SaveFile -> person.update", err)
 			}
-		} else if err != nil {
-			log.Fatal("SaveFile -> person.create", err)
 		}
 	}
 
 	for _, family := range saveFile.Families {
-		err := repositories.FamilyRepo.Create(family)
+		if family.Id == nil {
+			_, err := repositories.FamilyRepo.Create(family)
 
-		if err != nil && errors.As(err, &sqliteErr) && sqliteErr.Code() == sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY {
+			if err != nil {
+				log.Fatal("SaveFile -> family.create", err)
+			}
+		} else {
 			err := repositories.FamilyRepo.Update(family)
 
 			if err != nil {
 				log.Fatal("SaveFile -> family.update", err)
 			}
-		} else if err != nil {
-			log.Fatal("SaveFile -> family.create", err)
 		}
 	}
 
