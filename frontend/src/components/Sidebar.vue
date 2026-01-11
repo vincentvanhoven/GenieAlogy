@@ -68,6 +68,25 @@
                         px-1"
                 />
             </div>
+
+            <div class="mb-2">
+                <label for="family_id" class="font-semibold">Parents</label>
+                <select
+                    v-model="selectedNode.data.family_id"
+                    name="family_id"
+                    class="w-full bg-white border border-solid border-gray-400
+                        px-1"
+                >
+                    <option key="null" :value="null"></option>
+                    <option
+                        v-for="family in families"
+                        :key="family.id"
+                        :value="family.id"
+                    >
+                        {{ formatFamily(family) }}
+                    </option>
+                </select>
+            </div>
         </template>
 
         <template v-else> Select a person to edit </template>
@@ -76,11 +95,28 @@
 
 <script lang="ts" setup>
     import { Node } from "@vue-flow/core";
+    import { models } from "../../wailsjs/go/models";
     import { onMounted, ref, watch } from "vue";
     import { IMaskComponent } from "vue-imask";
+    import Person = models.Person;
+    import Family = models.Family;
 
     // Props
     const props = defineProps<{
         selectedNode: Node | null;
+        people: Person[];
+        families: Family[];
     }>();
+
+    // Methods
+    function formatFamily(family: Family): string {
+        let parents = props.people.filter((person) => {
+            return (
+                family.person_1_id === person.id ||
+                family.person_2_id === person.id
+            );
+        });
+
+        return `${parents[0].firstname} (${parents[0].id}) - ${parents[1].firstname} (${parents[1].id})`;
+    }
 </script>

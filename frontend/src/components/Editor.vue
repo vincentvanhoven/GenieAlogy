@@ -35,7 +35,11 @@
             </div>
         </div>
 
-        <Sidebar :selected-node="editor.selectedNode.value" />
+        <Sidebar
+            :people="editor.readonlyPeople.value"
+            :families="editor.readonlyFamilies.value"
+            :selected-node="editor.selectedNode.value"
+        />
     </div>
 </template>
 
