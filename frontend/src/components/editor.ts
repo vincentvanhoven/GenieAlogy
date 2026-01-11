@@ -6,7 +6,7 @@ import {
     NodeSelectionChange,
     MarkerType,
 } from "@vue-flow/core";
-import { AddPerson, SaveFile as DoSaveFile } from "../../wailsjs/go/main/App";
+import { AddPerson, RemovePerson, SaveFile as DoSaveFile } from "../../wailsjs/go/main/App";
 import { models } from "../../wailsjs/go/models";
 import SaveFile = models.SaveFile;
 import People = models.Person;
@@ -208,6 +208,29 @@ export function useEditor() {
         });
     }
 
+    function removeSelectedPerson() {
+        if(!selectedNode.value) {
+            return;
+        }
+
+        let personId = selectedNode.value.data.id;
+
+        RemovePerson(personId).then(() => {
+            // Cover the unlikely event that the saveFile was unloaded
+            if(!saveFile.value) {
+                return;
+            }
+
+            // Delete the person from the saveFile
+            let deletedPersonIndex = saveFile.value.people.findIndex(person => person.id == personId) as number;
+            saveFile.value.people.splice(deletedPersonIndex, 1)
+
+            // Re-init the nodes & edges
+            initNodes();
+            initEdges();
+        });
+    }
+
     const saveSaveFile = debounce(() => {
         isSaving.value = true;
 
@@ -287,5 +310,6 @@ export function useEditor() {
         handleNodesSelectionDrag,
         isSaving,
         addPerson,
+        removeSelectedPerson,
     };
 }

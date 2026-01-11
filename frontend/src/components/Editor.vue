@@ -44,9 +44,13 @@
 
                 <button
                     type="button"
+                    @click="editor.removeSelectedPerson"
+                    :disabled="!editor.selectedNode.value"
                     class="rounded border border-gray-500 p-0.5 cursor-pointer
                         hover:border-gray-400 hover:bg-gray-200 hover:shadow
-                        active:bg-gray-300"
+                        active:bg-gray-300
+                        disabled:cursor-not-allowed disabled:bg-gray-200
+                        disabled:hover:border-gray-500 disabled:hover:shadow-none"
                 >
                     <img
                         src="../assets/images/trash.svg"

@@ -86,6 +86,24 @@ func (a *App) AddPerson(position_x int, position_y int) (*models.Person, error) 
 	return person, err
 }
 
+func (a *App) RemovePerson(person models.Person) error {
+	families, err := repositories.FamilyRepo.FetchForPerson(person)
+
+	if err != nil {
+		return err
+	}
+
+	for _, family := range families {
+		err = repositories.FamilyRepo.Delete(*family.Id)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return repositories.PersonRepo.Delete(*person.Id)
+}
+
 func (a *App) SaveFile(saveFile models.SaveFile) error {
 	for _, person := range saveFile.People {
 		if person.Id == nil {
