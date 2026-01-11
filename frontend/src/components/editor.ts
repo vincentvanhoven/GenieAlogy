@@ -33,11 +33,15 @@ export function useEditor() {
     });
 
     const readonlyPeople: ComputedRef<Person[]> = computed(() => {
-        return (saveFile.value?.people ?? []).map(person => structuredClone(toRaw(person)));
+        return (saveFile.value?.people ?? []).map((person) =>
+            structuredClone(toRaw(person)),
+        );
     });
 
     const readonlyFamilies: ComputedRef<Family[]> = computed(() => {
-        return (saveFile.value?.families ?? []).map(family => structuredClone(toRaw(family)));
+        return (saveFile.value?.families ?? []).map((family) =>
+            structuredClone(toRaw(family)),
+        );
     });
 
     // Methods
@@ -90,7 +94,7 @@ export function useEditor() {
     function initNodes() {
         nodes.value = [];
 
-        if(!saveFile.value) {
+        if (!saveFile.value) {
             return;
         }
 
@@ -114,7 +118,7 @@ export function useEditor() {
     function initEdges() {
         edges.value = [];
 
-        if(!saveFile.value) {
+        if (!saveFile.value) {
             return;
         }
 
@@ -122,37 +126,33 @@ export function useEditor() {
             ...saveFile.value.families.flatMap((family) => [
                 ...(family.person_1_id
                     ? [
-                        {
-                            id: "family-" + family.id + "-male",
-                            type: "smoothstep",
-                            source: "person-" + family.person_1_id,
-                            target: "family-" + family.id,
-                            targetHandle: "left",
-                            style: { strokeWidth: 2 },
-                        },
-                    ]
+                          {
+                              id: "family-" + family.id + "-male",
+                              type: "smoothstep",
+                              source: "person-" + family.person_1_id,
+                              target: "family-" + family.id,
+                              targetHandle: "left",
+                              style: { strokeWidth: 2 },
+                          },
+                      ]
                     : []),
                 ...(family.person_2_id
                     ? [
-                        {
-                            id: "family-" + family.id + "-female",
-                            type: "smoothstep",
-                            source: "person-" + family.person_2_id,
-                            target: "family-" + family.id,
-                            targetHandle: "right",
-                            style: { strokeWidth: 2 },
-                        },
-                    ]
+                          {
+                              id: "family-" + family.id + "-female",
+                              type: "smoothstep",
+                              source: "person-" + family.person_2_id,
+                              target: "family-" + family.id,
+                              targetHandle: "right",
+                              style: { strokeWidth: 2 },
+                          },
+                      ]
                     : []),
             ]),
             ...saveFile.value.people
                 .filter((person) => person.family_id)
                 .map((person) => ({
-                    id:
-                        "family-" +
-                        person.family_id +
-                        "-child-" +
-                        person.id,
+                    id: "family-" + person.family_id + "-child-" + person.id,
                     type: "smoothstep",
                     source: "family-" + person.family_id,
                     target: "person-" + person.id,
@@ -181,12 +181,16 @@ export function useEditor() {
     }
 
     function handlePotentiallyChangedConnections(newValue: SaveFile): void {
-        let peopleWithChangedConnections: Person[] = newValue.people.filter((newPerson) => {
-            let oldPerson = previousSaveFile.value?.people.find(oldP => oldP.id === newPerson.id);
-            return oldPerson?.family_id !== newPerson.family_id;
-        });
+        let peopleWithChangedConnections: Person[] = newValue.people.filter(
+            (newPerson) => {
+                let oldPerson = previousSaveFile.value?.people.find(
+                    (oldP) => oldP.id === newPerson.id,
+                );
+                return oldPerson?.family_id !== newPerson.family_id;
+            },
+        );
 
-        if(peopleWithChangedConnections.length > 0) {
+        if (peopleWithChangedConnections.length > 0) {
             initEdges();
         }
     }
