@@ -11,7 +11,6 @@
                 v-model:nodes="editor.nodes.value"
                 v-model:edges="editor.edges.value"
                 @node-drag="editor.handleNodesSelectionDrag"
-                @move="editor.onMove"
                 :snap-grid="[16, 16]"
                 :snap-to-grid="true"
                 :min-zoom="0.01"
