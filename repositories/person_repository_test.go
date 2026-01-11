@@ -6,7 +6,6 @@ import (
 	"GenieAlogy/repositories"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -29,7 +28,7 @@ func TestPersonRepository_Create_Fetch(t *testing.T) {
 	testSetup(t)
 
 	personCreateData := models.Person{
-		uuid.New().String(),
+		nil,
 		"male",
 		seeders.Strptr("John"),
 		seeders.Strptr("Doe"),
@@ -41,13 +40,16 @@ func TestPersonRepository_Create_Fetch(t *testing.T) {
 		0,
 	}
 
-	err := repositories.PersonRepo.Create(personCreateData)
+	createdId, err := repositories.PersonRepo.Create(personCreateData)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	person, err := repositories.PersonRepo.Fetch(personCreateData.Uuid)
+	// Save the newly created ID to the test data
+	personCreateData.Id = createdId
+
+	person, err := repositories.PersonRepo.Fetch(*personCreateData.Id)
 
 	if err != nil {
 		t.Fatal(err)
@@ -60,7 +62,7 @@ func TestPersonRepository_Update_Fetch(t *testing.T) {
 	testSetup(t)
 
 	personCreateData := models.Person{
-		uuid.New().String(),
+		nil,
 		"male",
 		seeders.Strptr("John"),
 		seeders.Strptr("Doe"),
@@ -72,14 +74,17 @@ func TestPersonRepository_Update_Fetch(t *testing.T) {
 		0,
 	}
 
-	err := repositories.PersonRepo.Create(personCreateData)
+	createdId, err := repositories.PersonRepo.Create(personCreateData)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	// Save the newly created ID to the test data
+	personCreateData.Id = createdId
+
 	personUpdateData := models.Person{
-		personCreateData.Uuid,
+		personCreateData.Id,
 		"male",
 		seeders.Strptr("James"),
 		seeders.Strptr("Johnson"),
@@ -96,7 +101,7 @@ func TestPersonRepository_Update_Fetch(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	person, err := repositories.PersonRepo.Fetch(personCreateData.Uuid)
+	person, err := repositories.PersonRepo.Fetch(*personCreateData.Id)
 
 	if err != nil {
 		t.Fatal(err)
@@ -110,7 +115,7 @@ func TestPersonRepository_Delete_Fetch(t *testing.T) {
 	testSetup(t)
 
 	personCreateData := models.Person{
-		uuid.New().String(),
+		nil,
 		"male",
 		seeders.Strptr("John"),
 		seeders.Strptr("Doe"),
@@ -122,18 +127,21 @@ func TestPersonRepository_Delete_Fetch(t *testing.T) {
 		0,
 	}
 
-	err := repositories.PersonRepo.Create(personCreateData)
+	createdId, err := repositories.PersonRepo.Create(personCreateData)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = repositories.PersonRepo.Delete(personCreateData.Uuid)
+	// Save the newly created ID to the test data
+	personCreateData.Id = createdId
+
+	err = repositories.PersonRepo.Delete(*personCreateData.Id)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	person, err := repositories.PersonRepo.Fetch(personCreateData.Uuid)
+	person, err := repositories.PersonRepo.Fetch(*personCreateData.Id)
 
 	if err == nil || person != nil {
 		t.Fatal("person was not deleted")

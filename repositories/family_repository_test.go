@@ -6,7 +6,6 @@ import (
 	"GenieAlogy/repositories"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -30,20 +29,23 @@ func TestFamilyRepository_Create_Fetch(t *testing.T) {
 	testSetup(t)
 
 	familyCreateData := models.Family{
-		uuid.New().String(),
-		seeders.Strptr(uuid.New().String()),
-		seeders.Strptr(uuid.New().String()),
+		nil,
+		seeders.Intptr(1),
+		seeders.Intptr(2),
 		0,
 		0,
 	}
 
-	err := repositories.FamilyRepo.Create(familyCreateData)
+	createdId, err := repositories.FamilyRepo.Create(familyCreateData)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	family, err := repositories.FamilyRepo.Fetch(familyCreateData.Uuid)
+	// Save the newly created ID to the test data
+	familyCreateData.Id = createdId
+
+	family, err := repositories.FamilyRepo.Fetch(*familyCreateData.Id)
 
 	if err != nil {
 		t.Fatal(err)
@@ -56,23 +58,26 @@ func TestFamilyRepository_Update_Fetch(t *testing.T) {
 	testSetup(t)
 
 	familyCreateData := models.Family{
-		uuid.New().String(),
-		seeders.Strptr(uuid.New().String()),
-		seeders.Strptr(uuid.New().String()),
+		nil,
+		seeders.Intptr(0),
+		seeders.Intptr(1),
 		0,
 		0,
 	}
 
-	err := repositories.FamilyRepo.Create(familyCreateData)
+	createdId, err := repositories.FamilyRepo.Create(familyCreateData)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	// Save the newly created ID to the test data
+	familyCreateData.Id = createdId
+
 	familyUpdateData := models.Family{
-		familyCreateData.Uuid,
-		seeders.Strptr(uuid.New().String()),
-		seeders.Strptr(uuid.New().String()),
+		familyCreateData.Id,
+		seeders.Intptr(2),
+		seeders.Intptr(3),
 		0,
 		0,
 	}
@@ -82,7 +87,7 @@ func TestFamilyRepository_Update_Fetch(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	family, err := repositories.FamilyRepo.Fetch(familyCreateData.Uuid)
+	family, err := repositories.FamilyRepo.Fetch(*familyCreateData.Id)
 
 	if err != nil {
 		t.Fatal(err)
@@ -96,25 +101,28 @@ func TestFamilyRepository_Delete_Fetch(t *testing.T) {
 	testSetup(t)
 
 	familyCreateData := models.Family{
-		uuid.New().String(),
-		seeders.Strptr(uuid.New().String()),
-		seeders.Strptr(uuid.New().String()),
+		nil,
+		seeders.Intptr(1),
+		seeders.Intptr(2),
 		0,
 		0,
 	}
 
-	err := repositories.FamilyRepo.Create(familyCreateData)
+	createdId, err := repositories.FamilyRepo.Create(familyCreateData)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = repositories.FamilyRepo.Delete(familyCreateData.Uuid)
+	// Save the newly created ID to the test data
+	familyCreateData.Id = createdId
+
+	err = repositories.FamilyRepo.Delete(*familyCreateData.Id)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	family, err := repositories.FamilyRepo.Fetch(familyCreateData.Uuid)
+	family, err := repositories.FamilyRepo.Fetch(*familyCreateData.Id)
 
 	if err == nil || family != nil {
 		t.Fatal("family was not deleted")

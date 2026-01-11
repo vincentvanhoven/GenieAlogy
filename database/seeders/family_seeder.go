@@ -4,8 +4,6 @@ import (
 	"GenieAlogy/models"
 	"GenieAlogy/repositories"
 	"log"
-
-	"github.com/google/uuid"
 )
 
 func RunFamilySeeder() {
@@ -18,23 +16,23 @@ func RunFamilySeeder() {
 
 	families := []models.Family{
 		{
-			uuid.New().String(),
-			Strptr(grouped["male"][0].Uuid),
-			Strptr(grouped["female"][0].Uuid),
+			nil,
+			grouped["male"][0].Id,
+			grouped["female"][0].Id,
 			0,
 			0,
 		},
 		{
-			uuid.New().String(),
-			Strptr(grouped["male"][1].Uuid),
-			Strptr(grouped["female"][1].Uuid),
+			nil,
+			grouped["male"][1].Id,
+			grouped["female"][1].Id,
 			0,
 			0,
 		},
 	}
 
 	for _, f := range families {
-		err := repositories.FamilyRepo.Create(f)
+		_, err := repositories.FamilyRepo.Create(f)
 		if err != nil {
 			log.Fatal(err)
 		}

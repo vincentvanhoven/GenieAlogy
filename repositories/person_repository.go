@@ -2,6 +2,10 @@ package repositories
 
 import (
 	"GenieAlogy/models"
+	"database/sql"
+	"errors"
+	"fmt"
+	"math"
 )
 
 type PersonRepository struct {
@@ -9,42 +13,68 @@ type PersonRepository struct {
 
 var PersonRepo = &PersonRepository{}
 
-func (repo *PersonRepository) Create(p models.Person) error {
+func (repo *PersonRepository) Create(p models.Person) (*int, error) {
+	var lastInsertId int64
+
 	// Open transaction
 	transaction, err := DatabaseRepo.DB.Begin()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
+	var result sql.Result
+
 	// Attempt the execution of the prepared statement
-	_, err = transaction.Exec(
+	result, err = transaction.Exec(
 		`INSERT INTO people (
-				uuid, sex, firstname, lastname, birthdate, birthplace, family_uuid, position_x, position_y
+				sex, firstname, lastname, birthdate, birthplace, family_id, position_x, position_y
 			)
-         	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		p.Uuid, p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyUuid, p.PositionX, p.PositionY,
+         	VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+		p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyId, p.PositionX, p.PositionY,
 	)
 
 	// Rollback if anything went wrong
 	if err != nil {
 		rollbackerr := transaction.Rollback()
 		if rollbackerr != nil {
-			return rollbackerr
+			return nil, rollbackerr
 		}
 
-		return err
+		return nil, err
 	}
 
 	// All went well, commit the transaction (this may return an error)
-	return transaction.Commit()
+	err = transaction.Commit()
+
+	// Handle the error, if anything went wrong
+	if err != nil {
+		return nil, err
+	}
+
+	// Attempt to get the Id that was inserted
+	lastInsertId, err = result.LastInsertId()
+
+	// Handle the error, if anything went wrong
+	if err != nil {
+		return nil, err
+	}
+
+	// If lastInsertId cannot be cast to int64, thrown an error
+	if lastInsertId < math.MinInt || lastInsertId > math.MaxInt {
+		return nil, errors.New(fmt.Sprintf("Last insert id out of range: %d", lastInsertId))
+	}
+
+	// Else, cast and retun it
+	var castInsertId = int(lastInsertId)
+	return &castInsertId, nil
 }
 
-func (repo *PersonRepository) Fetch(uuid string) (*models.Person, error) {
+func (repo *PersonRepository) Fetch(id int) (*models.Person, error) {
 	var p models.Person
 
 	err := DatabaseRepo.DB.
-		QueryRow(`SELECT * FROM people WHERE uuid = ?`, uuid).
-		Scan(&p.Uuid, &p.Sex, &p.Firstname, &p.Lastname, &p.Birthdate, &p.Birthplace, &p.FamilyUuid, &p.ProfilePicture, &p.PositionX, &p.PositionY)
+		QueryRow(`SELECT * FROM people WHERE id = ?`, id).
+		Scan(&p.Id, &p.Sex, &p.Firstname, &p.Lastname, &p.Birthdate, &p.Birthplace, &p.FamilyId, &p.ProfilePicture, &p.PositionX, &p.PositionY)
 
 	if err != nil {
 		return nil, err
@@ -65,13 +95,13 @@ func (repo *PersonRepository) FetchAll() ([]models.Person, error) {
 	for rows.Next() {
 		var row models.Person
 		err := rows.Scan(
-			&row.Uuid,
+			&row.Id,
 			&row.Sex,
 			&row.Firstname,
 			&row.Lastname,
 			&row.Birthdate,
 			&row.Birthplace,
-			&row.FamilyUuid,
+			&row.FamilyId,
 			&row.ProfilePicture,
 			&row.PositionX,
 			&row.PositionY,
@@ -102,10 +132,10 @@ func (repo *PersonRepository) Update(p models.Person) error {
 	_, err = transaction.Exec(
 		`
 			UPDATE people
-			SET sex=?, firstname=?, lastname=?, birthdate=?, birthplace=?, family_uuid=?, profile_picture=?, position_x=?, position_y=?
-			WHERE uuid=?
+			SET sex=?, firstname=?, lastname=?, birthdate=?, birthplace=?, family_id=?, profile_picture=?, position_x=?, position_y=?
+			WHERE id=?
 		`,
-		p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyUuid, p.ProfilePicture, p.PositionX, p.PositionY, p.Uuid, p.Uuid,
+		p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyId, p.ProfilePicture, p.PositionX, p.PositionY, p.Id,
 	)
 
 	// Rollback if anything went wrong
@@ -122,10 +152,10 @@ func (repo *PersonRepository) Update(p models.Person) error {
 	return transaction.Commit()
 }
 
-func (repo *PersonRepository) Delete(uuid string) error {
+func (repo *PersonRepository) Delete(id int) error {
 	_, err := DatabaseRepo.DB.Exec(
-		`DELETE FROM people WHERE uuid=?`,
-		uuid,
+		`DELETE FROM people WHERE id=?`,
+		id,
 	)
 
 	return err
