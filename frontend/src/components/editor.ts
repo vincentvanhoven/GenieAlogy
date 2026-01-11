@@ -6,7 +6,7 @@ import {
     NodeSelectionChange,
     MarkerType,
 } from "@vue-flow/core";
-import { SaveFile as DoSaveFile } from "../../wailsjs/go/main/App";
+import { AddPerson, SaveFile as DoSaveFile } from "../../wailsjs/go/main/App";
 import { models } from "../../wailsjs/go/models";
 import SaveFile = models.SaveFile;
 import People = models.Person;
@@ -25,9 +25,13 @@ export function useEditor() {
     let isSaving: Ref<boolean> = ref(false);
 
     // Composables
-    const { getSelectedNodes, onNodesChange } = useVueFlow();
+    const { getSelectedNodes, onNodesChange, getViewport, project } = useVueFlow();
 
     // Computed properties
+    const hasLoadedSaveFile: ComputedRef<boolean> = computed(() => {
+        return !!saveFile.value;
+    });
+
     const selectedNode: ComputedRef<Node | null> = computed(() => {
         return selectedNodes.value.length == 1 ? selectedNodes.value[0] : null;
     });
@@ -164,6 +168,41 @@ export function useEditor() {
         ];
     }
 
+    function addPerson() {
+        if (!gridCanvas.value) {
+            return;
+        }
+
+        const nodeWidth = 256;
+        const nodeHeight = 64;
+        const gridSize = 50;
+
+        // screen center coordinates
+        const centerScreen = {
+            x: gridCanvas.value.getBoundingClientRect().width / 2,
+            y: gridCanvas.value.getBoundingClientRect().height / 2
+        }
+
+        // convert to graph coordinates
+        const centerGraph = project(centerScreen)
+
+        const position = {
+            x: Math.round((centerGraph.x - nodeWidth / 2) / gridSize) * gridSize,
+            y: Math.round((centerGraph.y - nodeHeight / 2) / gridSize) * gridSize,
+        }
+
+        AddPerson(position.x, position.y).then((person) => {
+            saveFile.value?.people.push(person);
+
+            nodes.value.push({
+                id: "person-" + person.id,
+                type: "person",
+                position: { x: person.position_x, y: person.position_y },
+                data: person,
+            });
+        })
+    }
+
     const saveSaveFile = debounce(() => {
         isSaving.value = true;
 
@@ -235,11 +274,13 @@ export function useEditor() {
     return {
         nodes,
         edges,
+        hasLoadedSaveFile,
         selectedNode,
         readonlyPeople,
         readonlyFamilies,
         init,
         handleNodesSelectionDrag,
         isSaving,
+        addPerson,
     };
 }
