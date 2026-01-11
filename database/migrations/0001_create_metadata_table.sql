@@ -1,7 +1,7 @@
 -- +goose Up
 CREATE TABLE metadata
 (
-    id    TEXT PRIMARY KEY,
+    id    INTEGER PRIMARY KEY AUTOINCREMENT,
     value TEXT
 );
 
