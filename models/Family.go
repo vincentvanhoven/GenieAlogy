@@ -1,9 +1,9 @@
 package models
 
 type Family struct {
-	Uuid        string  `json:"uuid"`
-	Person1Uuid *string `json:"person_1_uuid"`
-	Person2Uuid *string `json:"person_2_uuid"`
-	PositionX   int     `json:"position_x"`
-	PositionY   int     `json:"position_y"`
+	Id        *int `json:"id"`
+	Person1Id *int `json:"person_1_id"`
+	Person2Id *int `json:"person_2_id"`
+	PositionX int  `json:"position_x"`
+	PositionY int  `json:"position_y"`
 }

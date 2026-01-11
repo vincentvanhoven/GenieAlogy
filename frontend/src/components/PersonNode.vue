@@ -28,7 +28,7 @@
             class="h-full flex justify-center items-center text-sm font-semibold
                 bg-transparent"
         >
-            {{ data.firstname }} {{ data.lastname }}
+            {{ data.firstname }} {{ data.lastname }} ({{ data.id }})
         </div>
     </div>
 </template>

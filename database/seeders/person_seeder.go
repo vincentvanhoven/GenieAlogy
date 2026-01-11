@@ -4,14 +4,12 @@ import (
 	"GenieAlogy/models"
 	"GenieAlogy/repositories"
 	"log"
-
-	"github.com/google/uuid"
 )
 
 func RunPeopleSeeder() {
 	persons := []models.Person{
 		{
-			uuid.New().String(),
+			nil,
 			"male",
 			Strptr("John"),
 			Strptr("Doe"),
@@ -23,7 +21,7 @@ func RunPeopleSeeder() {
 			0,
 		},
 		{
-			uuid.New().String(),
+			nil,
 			"male",
 			Strptr("John"),
 			Strptr("Doe"),
@@ -35,7 +33,7 @@ func RunPeopleSeeder() {
 			0,
 		},
 		{
-			uuid.New().String(),
+			nil,
 			"male",
 			Strptr("John"),
 			Strptr("Doe"),
@@ -47,7 +45,7 @@ func RunPeopleSeeder() {
 			0,
 		},
 		{
-			uuid.New().String(),
+			nil,
 			"female",
 			Strptr("Jane"),
 			Strptr("Doe"),
@@ -59,7 +57,7 @@ func RunPeopleSeeder() {
 			0,
 		},
 		{
-			uuid.New().String(),
+			nil,
 			"female",
 			Strptr("Jane"),
 			Strptr("Doe"),
@@ -71,7 +69,7 @@ func RunPeopleSeeder() {
 			0,
 		},
 		{
-			uuid.New().String(),
+			nil,
 			"female",
 			Strptr("Jane"),
 			Strptr("Doe"),
@@ -85,7 +83,7 @@ func RunPeopleSeeder() {
 	}
 
 	for _, p := range persons {
-		err := repositories.PersonRepo.Create(p)
+		_, err := repositories.PersonRepo.Create(p)
 
 		if err != nil {
 			log.Fatal(err)

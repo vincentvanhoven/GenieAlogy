@@ -33,7 +33,10 @@ func main() {
 		if err != nil {
 			log.Default().Println(err)
 		}
-		rt.EventsEmit(app.ctx, "onSaveFileLoaded", saveFile)
+
+		if saveFile != nil {
+			rt.EventsEmit(app.ctx, "onSaveFileLoaded", saveFile)
+		}
 	})
 	FileMenu.AddSeparator()
 	FileMenu.AddText("Save", keys.CmdOrCtrl("s"), func(_ *menu.CallbackData) {

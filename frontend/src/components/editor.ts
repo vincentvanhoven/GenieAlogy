@@ -17,6 +17,7 @@ import Person = models.Person;
 export function useEditor() {
     // Data
     const saveFile: Ref<SaveFile | null> = ref(null);
+    const previousSaveFile: Ref<SaveFile | null> = ref(null);
     const nodes = ref<Node[]>([]);
     const edges = ref<Edge[]>([]);
     const selectedNodes = ref<Node[]>([]);
@@ -29,6 +30,18 @@ export function useEditor() {
     // Computed properties
     const selectedNode: ComputedRef<Node | null> = computed(() => {
         return selectedNodes.value.length == 1 ? selectedNodes.value[0] : null;
+    });
+
+    const readonlyPeople: ComputedRef<Person[]> = computed(() => {
+        return (saveFile.value?.people ?? []).map((person) =>
+            structuredClone(toRaw(person)),
+        );
+    });
+
+    const readonlyFamilies: ComputedRef<Family[]> = computed(() => {
+        return (saveFile.value?.families ?? []).map((family) =>
+            structuredClone(toRaw(family)),
+        );
     });
 
     // Methods
@@ -74,43 +87,62 @@ export function useEditor() {
         saveFile.value = null;
         saveFile.value = JSON;
 
+        initNodes();
+        initEdges();
+    }
+
+    function initNodes() {
+        nodes.value = [];
+
+        if (!saveFile.value) {
+            return;
+        }
+
         nodes.value = [
             ...saveFile.value.people.map((person) => ({
-                id: "person-" + person.uuid,
+                id: "person-" + person.id,
                 type: "person",
                 position: { x: person.position_x, y: person.position_y },
                 data: person,
             })),
             ...saveFile.value.families.map((family) => ({
-                id: "family-" + family.uuid,
+                id: "family-" + family.id,
                 type: "family",
                 position: { x: family.position_x, y: family.position_y },
                 data: family,
                 origin: [12.5, 12.5],
             })),
         ];
+    }
+
+    function initEdges() {
+        edges.value = [];
+
+        if (!saveFile.value) {
+            return;
+        }
 
         edges.value = [
             ...saveFile.value.families.flatMap((family) => [
-                ...(family.person_1_uuid
+                ...(family.person_1_id
                     ? [
                           {
-                              id: "family-" + family.uuid + "-male",
+                              id: "family-" + family.id + "-male",
                               type: "smoothstep",
-                              source: "person-" + family.person_1_uuid,
-                              target: "family-" + family.uuid,
+                              source: "person-" + family.person_1_id,
+                              target: "family-" + family.id,
                               targetHandle: "left",
                               style: { strokeWidth: 2 },
                           },
                       ]
                     : []),
-                ...(family.person_2_uuid
+                ...(family.person_2_id
                     ? [
                           {
-                              id: "family-" + family.uuid + "-female",
+                              id: "family-" + family.id + "-female",
                               type: "smoothstep",
-                              source: "person-" + family.person_2_uuid,
-                              target: "family-" + family.uuid,
+                              source: "person-" + family.person_2_id,
+                              target: "family-" + family.id,
                               targetHandle: "right",
                               style: { strokeWidth: 2 },
                           },
@@ -118,16 +150,12 @@ export function useEditor() {
                     : []),
             ]),
             ...saveFile.value.people
-                .filter((person) => person.family_uuid)
+                .filter((person) => person.family_id)
                 .map((person) => ({
-                    id:
-                        "family-" +
-                        person.family_uuid +
-                        "-child-" +
-                        person.uuid,
+                    id: "family-" + person.family_id + "-child-" + person.id,
                     type: "smoothstep",
-                    source: "family-" + person.family_uuid,
-                    target: "person-" + person.uuid,
+                    source: "family-" + person.family_id,
+                    target: "person-" + person.id,
                     markerEnd: {
                         type: MarkerType.ArrowClosed,
                         color: "black",
@@ -152,6 +180,21 @@ export function useEditor() {
         });
     }
 
+    function handlePotentiallyChangedConnections(newValue: SaveFile): void {
+        let peopleWithChangedConnections: Person[] = newValue.people.filter(
+            (newPerson) => {
+                let oldPerson = previousSaveFile.value?.people.find(
+                    (oldP) => oldP.id === newPerson.id,
+                );
+                return oldPerson?.family_id !== newPerson.family_id;
+            },
+        );
+
+        if (peopleWithChangedConnections.length > 0) {
+            initEdges();
+        }
+    }
+
     function debounce<T extends (...args: any[]) => any>(
         func: T,
         delay: number = 1000,
@@ -172,11 +215,19 @@ export function useEditor() {
 
     watch(
         () => saveFile.value,
-        (value, oldValue) => {
+        (newValue, oldValue) => {
             // This check prevents saving immediately after loading a savefile.
-            if (value !== null && oldValue !== null) {
+            if (newValue !== null && oldValue !== null) {
+                // The previous state of the saveFile is tracked manually to
+                // work around limitations with 'deep' watchers.
+                if (previousSaveFile.value) {
+                    handlePotentiallyChangedConnections(newValue);
+                }
+
                 saveSaveFile();
             }
+
+            previousSaveFile.value = structuredClone(toRaw(newValue));
         },
         { deep: true },
     );
@@ -185,6 +236,8 @@ export function useEditor() {
         nodes,
         edges,
         selectedNode,
+        readonlyPeople,
+        readonlyFamilies,
         init,
         handleNodesSelectionDrag,
         isSaving,

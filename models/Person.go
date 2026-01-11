@@ -1,13 +1,13 @@
 package models
 
 type Person struct {
-	Uuid           string  `json:"uuid"`
+	Id             *int    `json:"id"`
 	Sex            string  `json:"sex"`
 	Firstname      *string `json:"firstname"`
 	Lastname       *string `json:"lastname"`
 	Birthdate      *string `json:"birthdate"`
 	Birthplace     *string `json:"birthplace"`
-	FamilyUuid     *string `json:"family_uuid"`
+	FamilyId       *int    `json:"family_id"`
 	ProfilePicture *string `json:"profile_picture"`
 	PositionX      int     `json:"position_x"`
 	PositionY      int     `json:"position_y"`

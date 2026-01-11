@@ -1,17 +1,17 @@
 -- +goose Up
 CREATE TABLE people
 (
-    uuid            TEXT PRIMARY KEY,
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
     sex             TEXT CHECK (sex IN ('male', 'female')),
     firstname       TEXT,
     lastname        TEXT,
     birthdate       TEXT,
     birthplace      TEXT,
-    family_uuid     TEXT,
+    family_id       INTEGER,
     profile_picture BLOB,
     position_x      INTEGER,
     position_y      INTEGER
---     FOREIGN KEY (family_uuid) REFERENCES families (uuid) ON DELETE RESTRICT
+--     FOREIGN KEY (family_id) REFERENCES families (id) ON DELETE RESTRICT
 );
 
 -- +goose Down
