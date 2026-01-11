@@ -71,6 +71,21 @@ func (a *App) LoadFile() (*models.SaveFile, error) {
 	return &saveFile, nil
 }
 
+func (a *App) AddPerson(position_x int, position_y int) (*models.Person, error) {
+	createdId, err := repositories.PersonRepo.Create(models.Person{
+		Sex:       "male",
+		PositionX: position_x,
+		PositionY: position_y,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	person, err := repositories.PersonRepo.Fetch(*createdId)
+	return person, err
+}
+
 func (a *App) SaveFile(saveFile models.SaveFile) error {
 	for _, person := range saveFile.People {
 		if person.Id == nil {

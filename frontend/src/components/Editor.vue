@@ -28,6 +28,34 @@
             </VueFlow>
 
             <div
+                v-show="editor.hasLoadedSaveFile.value"
+                class="absolute right-3 top-2 flex gap-2 rounded shadow p-2
+                    bg-white border border-gray-200"
+            >
+                <button
+                    @click="editor.addPerson"
+                    type="button"
+                    class="rounded border border-gray-500 p-0.5 cursor-pointer
+                        hover:border-gray-400 hover:bg-gray-200 hover:shadow
+                        active:bg-gray-300"
+                >
+                    <img src="../assets/images/plus.svg" class="w-4 h-4" />
+                </button>
+
+                <button
+                    type="button"
+                    class="rounded border border-gray-500 p-0.5 cursor-pointer
+                        hover:border-gray-400 hover:bg-gray-200 hover:shadow
+                        active:bg-gray-300"
+                >
+                    <img
+                        src="../assets/images/trash.svg"
+                        class="w-4 h-4 p-0.5"
+                    />
+                </button>
+            </div>
+
+            <div
                 class="absolute left-3 bottom-2 transition-all duration-300"
                 :class="!!showSavingMessage ? 'opacity-100' : 'opacity-0'"
             >
