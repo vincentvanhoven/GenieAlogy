@@ -32,7 +32,8 @@
                 <select
                     v-model="selectedNode.data.sex"
                     name="sex"
-                    class="w-full bg-white border border-solid border-gray-400 px-1"
+                    class="w-full bg-white border border-solid border-gray-400
+                        px-1"
                 >
                     <option key="male" value="male">Male</option>
                     <option key="female" value="female">Female</option>
@@ -40,7 +41,9 @@
             </div>
 
             <div class="mb-2">
-                <label for="birthdate" class="font-semibold">Date of birth</label>
+                <label for="birthdate" class="font-semibold"
+                    >Date of birth</label
+                >
                 <!-- :unmask="true" -->
                 <IMaskComponent
                     v-model="selectedNode.data.birthdate"
@@ -54,13 +57,16 @@
             </div>
 
             <div class="mb-2">
-                <label for="birthplace" class="font-semibold">Location of birth</label>
+                <label for="birthplace" class="font-semibold"
+                    >Location of birth</label
+                >
                 <input
                     v-model="selectedNode.data.birthplace"
                     name="birthplace"
                     type="text"
                     class="w-full bg-white border border-solid border-gray-400
-                        px-1" />
+                        px-1"
+                />
             </div>
         </template>
 
