@@ -25,7 +25,8 @@ export function useEditor() {
     let isSaving: Ref<boolean> = ref(false);
 
     // Composables
-    const { getSelectedNodes, onNodesChange, getViewport, project } = useVueFlow();
+    const { getSelectedNodes, onNodesChange, getViewport, project } =
+        useVueFlow();
 
     // Computed properties
     const hasLoadedSaveFile: ComputedRef<boolean> = computed(() => {
@@ -180,16 +181,20 @@ export function useEditor() {
         // screen center coordinates
         const centerScreen = {
             x: gridCanvas.value.getBoundingClientRect().width / 2,
-            y: gridCanvas.value.getBoundingClientRect().height / 2
-        }
+            y: gridCanvas.value.getBoundingClientRect().height / 2,
+        };
 
         // convert to graph coordinates
-        const centerGraph = project(centerScreen)
+        const centerGraph = project(centerScreen);
 
         const position = {
-            x: Math.round((centerGraph.x - nodeWidth / 2) / gridSize) * gridSize,
-            y: Math.round((centerGraph.y - nodeHeight / 2) / gridSize) * gridSize,
-        }
+            x:
+                Math.round((centerGraph.x - nodeWidth / 2) / gridSize) *
+                gridSize,
+            y:
+                Math.round((centerGraph.y - nodeHeight / 2) / gridSize) *
+                gridSize,
+        };
 
         AddPerson(position.x, position.y).then((person) => {
             saveFile.value?.people.push(person);
@@ -200,7 +205,7 @@ export function useEditor() {
                 position: { x: person.position_x, y: person.position_y },
                 data: person,
             });
-        })
+        });
     }
 
     const saveSaveFile = debounce(() => {
