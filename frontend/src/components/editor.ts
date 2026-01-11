@@ -21,8 +21,6 @@ export function useEditor() {
     const edges = ref<Edge[]>([]);
     const selectedNodes = ref<Node[]>([]);
     const gridCanvas: Ref<HTMLCanvasElement | null> = ref(null);
-    let offset = { x: 0, y: 0, zoom: 1 };
-    let queueSave: Ref<boolean> = ref(false);
     let isSaving: Ref<boolean> = ref(false);
 
     // Composables
@@ -154,18 +152,16 @@ export function useEditor() {
         });
     }
 
-    function onMove({ event, flowTransform }: any): void {
-        offset.x = flowTransform.x;
-        offset.y = flowTransform.y;
-        offset.zoom = flowTransform.zoom;
-    }
-
     function debounce<T extends (...args: any[]) => any>(
         func: T,
         delay: number = 1000,
     ): (...args: Parameters<T>) => void {
+        // Prepare a var that will hold the timeout id, so it can be cleared
         let timer: ReturnType<typeof setTimeout>;
 
+        // Return a function that wraps the closure call in a timeout that
+        // clears (resets) every time the debounced function is called before
+        // the timer runs out.
         return (...args: Parameters<T>) => {
             clearTimeout(timer);
             timer = setTimeout(() => {
@@ -191,7 +187,6 @@ export function useEditor() {
         selectedNode,
         init,
         handleNodesSelectionDrag,
-        onMove,
         isSaving,
     };
 }
