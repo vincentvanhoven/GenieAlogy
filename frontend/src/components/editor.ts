@@ -6,7 +6,11 @@ import {
     NodeSelectionChange,
     MarkerType,
 } from "@vue-flow/core";
-import { AddPerson, RemovePerson, SaveFile as DoSaveFile } from "../../wailsjs/go/main/App";
+import {
+    AddPerson,
+    RemovePerson,
+    SaveFile as DoSaveFile,
+} from "../../wailsjs/go/main/App";
 import { models } from "../../wailsjs/go/models";
 import SaveFile = models.SaveFile;
 import People = models.Person;
@@ -210,7 +214,7 @@ export function useEditor() {
     }
 
     function removeSelectedPerson() {
-        if(!selectedNode.value) {
+        if (!selectedNode.value) {
             return;
         }
 

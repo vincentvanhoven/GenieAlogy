@@ -111,14 +111,14 @@
     // Computed properties
     const birthdate = computed({
         get() {
-            return props.selectedNode?.data.birthdate || ''
+            return props.selectedNode?.data.birthdate || "";
         },
         set(value) {
-            if(props.selectedNode) {
-                props.selectedNode.data.birthdate = value || null
+            if (props.selectedNode) {
+                props.selectedNode.data.birthdate = value || null;
             }
-        }
-    })
+        },
+    });
 
     // Methods
     function formatFamily(family: Family): string {
