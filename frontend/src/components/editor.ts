@@ -6,7 +6,11 @@ import {
     NodeSelectionChange,
     MarkerType,
 } from "@vue-flow/core";
-import { AddPerson, SaveFile as DoSaveFile } from "../../wailsjs/go/main/App";
+import {
+    AddPerson,
+    RemovePerson,
+    SaveFile as DoSaveFile,
+} from "../../wailsjs/go/main/App";
 import { models } from "../../wailsjs/go/models";
 import SaveFile = models.SaveFile;
 import People = models.Person;
@@ -98,6 +102,7 @@ export function useEditor() {
 
     function initNodes() {
         nodes.value = [];
+        selectedNodes.value = [];
 
         if (!saveFile.value) {
             return;
@@ -208,6 +213,20 @@ export function useEditor() {
         });
     }
 
+    function removeSelectedPerson() {
+        if (!selectedNode.value) {
+            return;
+        }
+
+        let personToRemove = selectedNode.value.data as Person;
+
+        RemovePerson(personToRemove).then((newSaveFile: SaveFile) => {
+            // Since the edges may have changed following the Person's removal, reload the frontend state from the
+            // received saveFile
+            loadSaveFile(newSaveFile);
+        });
+    }
+
     const saveSaveFile = debounce(() => {
         isSaving.value = true;
 
@@ -287,5 +306,6 @@ export function useEditor() {
         handleNodesSelectionDrag,
         isSaving,
         addPerson,
+        removeSelectedPerson,
     };
 }

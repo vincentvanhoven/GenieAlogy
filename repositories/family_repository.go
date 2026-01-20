@@ -84,9 +84,40 @@ func (repo *FamilyRepository) Fetch(id int) (*models.Family, error) {
 }
 
 func (repo *FamilyRepository) FetchAll() ([]models.Family, error) {
-	var f []models.Family
+	f := []models.Family{}
 
 	rows, err := DatabaseRepo.DB.Query(`SELECT * FROM families`)
+	if err != nil {
+		return f, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var row models.Family
+		err := rows.Scan(&row.Id, &row.Person1Id, &row.Person2Id, &row.PositionX, &row.PositionY)
+
+		if err != nil {
+			return f, err
+		}
+		f = append(f, row)
+	}
+
+	// check for errors after iteration
+	if err = rows.Err(); err != nil {
+		return f, err
+	}
+
+	return f, nil
+}
+
+func (repo *FamilyRepository) FetchForPerson(person models.Person) ([]models.Family, error) {
+	var f []models.Family
+
+	rows, err := DatabaseRepo.DB.Query(
+		`SELECT * FROM families WHERE person_1_id = ? OR person_2_id = ?`,
+		person.Id, person.Id,
+	)
 	if err != nil {
 		return f, err
 	}

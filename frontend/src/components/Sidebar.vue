@@ -44,9 +44,9 @@
                 <label for="birthdate" class="font-semibold"
                     >Date of birth</label
                 >
-                <!-- :unmask="true" -->
+
                 <IMaskComponent
-                    v-model="selectedNode.data.birthdate"
+                    v-model="birthdate"
                     mask="0000-00-00"
                     name="birthdate"
                     type="text"
@@ -96,7 +96,7 @@
 <script lang="ts" setup>
     import { Node } from "@vue-flow/core";
     import { models } from "../../wailsjs/go/models";
-    import { onMounted, ref, watch } from "vue";
+    import { computed, onMounted, ref, watch } from "vue";
     import { IMaskComponent } from "vue-imask";
     import Person = models.Person;
     import Family = models.Family;
@@ -107,6 +107,18 @@
         people: Person[];
         families: Family[];
     }>();
+
+    // Computed properties
+    const birthdate = computed({
+        get() {
+            return props.selectedNode?.data.birthdate || "";
+        },
+        set(value) {
+            if (props.selectedNode) {
+                props.selectedNode.data.birthdate = value || null;
+            }
+        },
+    });
 
     // Methods
     function formatFamily(family: Family): string {
