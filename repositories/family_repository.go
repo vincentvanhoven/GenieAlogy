@@ -84,7 +84,7 @@ func (repo *FamilyRepository) Fetch(id int) (*models.Family, error) {
 }
 
 func (repo *FamilyRepository) FetchAll() ([]models.Family, error) {
-	var f []models.Family
+	f := []models.Family{}
 
 	rows, err := DatabaseRepo.DB.Query(`SELECT * FROM families`)
 	if err != nil {

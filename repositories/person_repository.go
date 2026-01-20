@@ -83,7 +83,7 @@ func (repo *PersonRepository) Fetch(id int) (*models.Person, error) {
 }
 
 func (repo *PersonRepository) FetchAll() ([]models.Person, error) {
-	var p []models.Person
+	p := []models.Person{}
 
 	rows, err := DatabaseRepo.DB.Query(`SELECT * FROM people`)
 	if err != nil {
@@ -156,6 +156,15 @@ func (repo *PersonRepository) Delete(id int) error {
 	_, err := DatabaseRepo.DB.Exec(
 		`DELETE FROM people WHERE id=?`,
 		id,
+	)
+
+	return err
+}
+
+func (repo *PersonRepository) ClearFamily(family_id int) error {
+	_, err := DatabaseRepo.DB.Exec(
+		`UPDATE people SET family_id = null WHERE family_id=?`,
+		family_id,
 	)
 
 	return err

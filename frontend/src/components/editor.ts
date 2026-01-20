@@ -98,6 +98,7 @@ export function useEditor() {
 
     function initNodes() {
         nodes.value = [];
+        selectedNodes.value = [];
 
         if (!saveFile.value) {
             return;
@@ -213,21 +214,12 @@ export function useEditor() {
             return;
         }
 
-        let personId = selectedNode.value.data.id;
+        let personToRemove = selectedNode.value.data as Person;
 
-        RemovePerson(personId).then(() => {
-            // Cover the unlikely event that the saveFile was unloaded
-            if(!saveFile.value) {
-                return;
-            }
-
-            // Delete the person from the saveFile
-            let deletedPersonIndex = saveFile.value.people.findIndex(person => person.id == personId) as number;
-            saveFile.value.people.splice(deletedPersonIndex, 1)
-
-            // Re-init the nodes & edges
-            initNodes();
-            initEdges();
+        RemovePerson(personToRemove).then((newSaveFile: SaveFile) => {
+            // Since the edges may have changed following the Person's removal, reload the frontend state from the
+            // received saveFile
+            loadSaveFile(newSaveFile);
         });
     }
 

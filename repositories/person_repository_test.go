@@ -147,3 +147,59 @@ func TestPersonRepository_Delete_Fetch(t *testing.T) {
 		t.Fatal("person was not deleted")
 	}
 }
+
+func TestPersonRepository_ClearFamily(t *testing.T) {
+	testSetup(t)
+
+	var createdPersonIds []int
+
+	for _ = range 5 {
+		personCreateData := models.Person{
+			nil,
+			"male",
+			seeders.Strptr("John"),
+			seeders.Strptr("Doe"),
+			seeders.Strptr("1950-01-01"),
+			seeders.Strptr("New York"),
+			seeders.Intptr(123),
+			nil,
+			0,
+			0,
+		}
+
+		createdId, err := repositories.PersonRepo.Create(personCreateData)
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		createdPersonIds = append(createdPersonIds, *createdId)
+	}
+
+	for _, id := range createdPersonIds {
+		person, err := repositories.PersonRepo.Fetch(id)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if *person.FamilyId != 123 {
+			t.Fatal("Expected FamilyId 123, got ", person.FamilyId)
+		}
+	}
+
+	err := repositories.PersonRepo.ClearFamily(123)
+	if err != nil {
+		return
+	}
+
+	for _, id := range createdPersonIds {
+		person, err := repositories.PersonRepo.Fetch(id)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if person.FamilyId != nil {
+			t.Fatal("Expected FamilyId nil, got ", *person.FamilyId)
+		}
+	}
+}
