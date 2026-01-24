@@ -42,7 +42,7 @@
 
             <div class="mb-2">
                 <label for="birthdate" class="font-semibold"
-                >Date of birth</label
+                    >Date of birth</label
                 >
 
                 <IMaskComponent
@@ -58,7 +58,7 @@
 
             <div class="mb-2">
                 <label for="birthplace" class="font-semibold"
-                >Location of birth</label
+                    >Location of birth</label
                 >
                 <input
                     v-model="selectedNode.data.birthplace"
@@ -91,68 +91,87 @@
             <div class="mb-2">
                 <table>
                     <thead>
-                    <tr>
-                        <th class="w-full text-left">Partnerships</th>
-                        <th class="pl-2">
-                            <button
-                                @click="startAddingFamily"
-                                type="button"
-                                class="rounded-full border border-gray-500 p-0.5 cursor-pointer
-                                    hover:border-gray-400 hover:bg-gray-200 hover:shadow
-                                    active:bg-gray-300 w-5 h-5 flex items-center justify-center"
-                            >
-                                <img src="../assets/images/plus.svg" class="w-4 h-4" />
-                            </button>
-                        </th>
-                    </tr>
+                        <tr>
+                            <th class="w-full text-left">Partnerships</th>
+                            <th class="pl-2">
+                                <button
+                                    @click="startAddingFamily"
+                                    type="button"
+                                    class="rounded-full border border-gray-500
+                                        p-0.5 cursor-pointer
+                                        hover:border-gray-400 hover:bg-gray-200
+                                        hover:shadow active:bg-gray-300 w-5 h-5
+                                        flex items-center justify-center"
+                                >
+                                    <img
+                                        src="../assets/images/plus.svg"
+                                        class="w-4 h-4"
+                                    />
+                                </button>
+                            </th>
+                        </tr>
                     </thead>
 
                     <tbody>
-                    <tr v-for="family in partnerships">
-                        <td>
-                            {{ formatFamily(family) }}
-                        </td>
-                        <td class="pl-2">
-                            <button
-                                @click="removeFamily(family)"
-                                type="button"
-                                class="rounded-full border border-gray-500 p-0.5 cursor-pointer
-                                    hover:border-gray-400 hover:bg-gray-200 hover:shadow
-                                    active:bg-gray-300 w-5 h-5 flex items-center justify-center"
-                            >
-                                <img src="../assets/images/trash.svg" class="w-4 h-4" />
-                            </button>
-                        </td>
-                    </tr>
-                    <tr v-if="addingFamily">
-                        <td>
-                            <select
-                                v-model="newFamilyPartnerId"
-                                name="new_family_partner_id"
-                                class="w-full bg-white border border-solid border-gray-400 px-1"
-                            >
-                                <option key="null" :value="null"></option>
-                                <option
-                                    v-for="person in people.filter((p: Person) => p.id !== selectedNode?.data.id)"
-                                    :key="person.id"
-                                    :value="person.id"
+                        <tr v-for="family in partnerships">
+                            <td>
+                                {{ formatFamily(family) }}
+                            </td>
+                            <td class="pl-2">
+                                <button
+                                    @click="removeFamily(family)"
+                                    type="button"
+                                    class="rounded-full border border-gray-500
+                                        p-0.5 cursor-pointer
+                                        hover:border-gray-400 hover:bg-gray-200
+                                        hover:shadow active:bg-gray-300 w-5 h-5
+                                        flex items-center justify-center"
                                 >
-                                    {{ person.firstname }} ({{ person.id}})
-                                </option>
-                            </select>
-                        </td>
-                        <td class="pl-2">
-                            <button
-                                @click="finishAddingFamily"
-                                type="button"
-                                class="rounded-full border border-gray-500 p-0.5 cursor-pointer
-                                    hover:border-gray-400 hover:bg-gray-200 hover:shadow
-                                    active:bg-gray-300 w-5 h-5 flex items-center justify-center"
-                            >
-                                <img src="../assets/images/check.svg" class="w-4 h-4" />
-                            </button>
-                        </td>
-                    </tr>
+                                    <img
+                                        src="../assets/images/trash.svg"
+                                        class="w-4 h-4"
+                                    />
+                                </button>
+                            </td>
+                        </tr>
+                        <tr v-if="addingFamily">
+                            <td>
+                                <select
+                                    v-model="newFamilyPartnerId"
+                                    name="new_family_partner_id"
+                                    class="w-full bg-white border border-solid
+                                        border-gray-400 px-1"
+                                >
+                                    <option key="null" :value="null"></option>
+                                    <option
+                                        v-for="person in people.filter(
+                                            (p: Person) =>
+                                                p.id !== selectedNode?.data.id,
+                                        )"
+                                        :key="person.id"
+                                        :value="person.id"
+                                    >
+                                        {{ person.firstname }} ({{ person.id }})
+                                    </option>
+                                </select>
+                            </td>
+                            <td class="pl-2">
+                                <button
+                                    @click="finishAddingFamily"
+                                    type="button"
+                                    class="rounded-full border border-gray-500
+                                        p-0.5 cursor-pointer
+                                        hover:border-gray-400 hover:bg-gray-200
+                                        hover:shadow active:bg-gray-300 w-5 h-5
+                                        flex items-center justify-center"
+                                >
+                                    <img
+                                        src="../assets/images/check.svg"
+                                        class="w-4 h-4"
+                                    />
+                                </button>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -179,13 +198,13 @@
 
     // Data
     const addingFamily: Ref<boolean> = ref(false);
-    const newFamilyPartnerId: Ref<number|null> = ref(null);
+    const newFamilyPartnerId: Ref<number | null> = ref(null);
 
     // Events
     const emit = defineEmits<{
-        (e: 'add-family', family: Family): void;
-        (e: 'remove-family', family: Family): void;
-    }>()
+        (e: "add-family", family: Family): void;
+        (e: "remove-family", family: Family): void;
+    }>();
 
     // Computed properties
     const birthdate = computed({
@@ -196,13 +215,15 @@
             if (props.selectedNode) {
                 props.selectedNode.data.birthdate = value || null;
             }
-        }
+        },
     });
 
     const partnerships = computed(() => {
         return props.families.filter((family) => {
-            return family.person_1_id === props.selectedNode?.data.id ||
-                family.person_2_id === props.selectedNode?.data.id;
+            return (
+                family.person_1_id === props.selectedNode?.data.id ||
+                family.person_2_id === props.selectedNode?.data.id
+            );
         });
     });
 
@@ -229,18 +250,24 @@
 
         let selfPerson: Person = props.selectedNode?.data;
         let newFamily: Family = {
-            person_1_id: selfPerson.sex == "male" ? selfPerson.id : newFamilyPartnerId.value,
-            person_2_id: selfPerson.sex == "male" ? newFamilyPartnerId.value : selfPerson.id,
+            person_1_id:
+                selfPerson.sex == "male"
+                    ? selfPerson.id
+                    : newFamilyPartnerId.value,
+            person_2_id:
+                selfPerson.sex == "male"
+                    ? newFamilyPartnerId.value
+                    : selfPerson.id,
             position_x: 0,
             position_y: 0,
-        }
+        };
 
-        emit('add-family', newFamily);
+        emit("add-family", newFamily);
         addingFamily.value = false;
         newFamilyPartnerId.value = null;
     }
 
     function removeFamily(family: Family) {
-        emit('remove-family', family);
+        emit("remove-family", family);
     }
 </script>

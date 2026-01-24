@@ -8,9 +8,10 @@ import {
 } from "@vue-flow/core";
 import {
     AddFamily,
-    AddPerson, RemoveFamily,
+    AddPerson,
+    RemoveFamily,
     RemovePerson,
-    SaveFile as DoSaveFile
+    SaveFile as DoSaveFile,
 } from "../../wailsjs/go/main/App";
 import { models } from "../../wailsjs/go/models";
 import SaveFile = models.SaveFile;
