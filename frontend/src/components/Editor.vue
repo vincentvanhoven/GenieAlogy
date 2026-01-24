@@ -71,6 +71,8 @@
             :people="editor.readonlyPeople.value"
             :families="editor.readonlyFamilies.value"
             :selected-node="editor.selectedNode.value"
+            @add-family="editor.addFamily"
+            @remove-family="editor.removeFamily"
         />
     </div>
 </template>

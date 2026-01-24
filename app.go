@@ -131,6 +131,62 @@ func (a *App) RemovePerson(person models.Person) (*models.SaveFile, error) {
 	return &saveFile, nil
 }
 
+func (a *App) AddFamily(family models.Family) (*models.SaveFile, error) {
+	_, err := repositories.FamilyRepo.Create(family)
+
+	if err != nil {
+		return nil, err
+	}
+
+	families, err := repositories.FamilyRepo.FetchAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	people, err := repositories.PersonRepo.FetchAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	saveFile := models.SaveFile{
+		people,
+		families,
+	}
+
+	return &saveFile, nil
+}
+
+func (a *App) RemoveFamily(family models.Family) (*models.SaveFile, error) {
+	err := repositories.FamilyRepo.Delete(*family.Id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = repositories.PersonRepo.ClearFamily(*family.Id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	families, err := repositories.FamilyRepo.FetchAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	people, err := repositories.PersonRepo.FetchAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	saveFile := models.SaveFile{
+		people,
+		families,
+	}
+
+	return &saveFile, nil
+}
+
 func (a *App) SaveFile(saveFile models.SaveFile) error {
 	for _, person := range saveFile.People {
 		if person.Id == nil {
