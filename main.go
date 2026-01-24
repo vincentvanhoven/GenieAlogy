@@ -28,6 +28,16 @@ func main() {
 	}
 
 	FileMenu := AppMenu.AddSubmenu("File")
+	FileMenu.AddText("New", nil, func(_ *menu.CallbackData) {
+		saveFile, err := app.NewFile()
+		if err != nil {
+			log.Default().Println(err)
+		}
+
+		if saveFile != nil {
+			rt.EventsEmit(app.ctx, "onSaveFileLoaded", saveFile)
+		}
+	})
 	FileMenu.AddText("Open", keys.CmdOrCtrl("o"), func(_ *menu.CallbackData) {
 		saveFile, err := app.LoadFile()
 		if err != nil {

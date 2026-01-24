@@ -12,16 +12,17 @@
         <Handle
             v-if="data.sex === 'female'"
             type="source"
-            :position="Position.Left"
-            :class="{ invisible: !connectedHandles.left }"
+            id="right"
+            :position="Position.Right"
+            :class="{ invisible: !connectedHandles.right }"
         />
 
         <Handle
             v-else
             type="source"
-            :position="Position.Right"
-            id="right"
-            :class="{ invisible: !connectedHandles.right }"
+            id="left"
+            :position="Position.Left"
+            :class="{ invisible: !connectedHandles.left }"
         />
 
         <div
@@ -56,8 +57,8 @@
 
         return {
             top: hasTargetEdge ?? false,
-            left: (hasSourceEdge && props.data.sex === "female") ?? false,
-            right: (hasSourceEdge && props.data.sex === "male") ?? false,
+            left: (hasSourceEdge && props.data.sex === "male") ?? false,
+            right: (hasSourceEdge && props.data.sex === "female") ?? false,
         };
     });
 
