@@ -25,6 +25,34 @@ func TestFamilyRepository_FetchAll(t *testing.T) {
 	}
 }
 
+func TestFamilyRepository_FetchForPerson(t *testing.T) {
+	testSetup(t)
+
+	seeders.RunPeopleSeeder()
+	seeders.RunFamilySeeder()
+
+	families, err := repositories.FamilyRepo.FetchAll()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	person, err := repositories.PersonRepo.Fetch(*families[0].Person1Id)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	family, err := repositories.FamilyRepo.FetchForPerson(*person)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(family) != 1 {
+		t.Fatal("Expected 1 family, got ", len(family))
+	}
+}
+
 func TestFamilyRepository_Create_Fetch(t *testing.T) {
 	testSetup(t)
 

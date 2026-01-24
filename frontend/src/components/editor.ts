@@ -7,7 +7,9 @@ import {
     MarkerType,
 } from "@vue-flow/core";
 import {
+    AddFamily,
     AddPerson,
+    RemoveFamily,
     RemovePerson,
     SaveFile as DoSaveFile,
 } from "../../wailsjs/go/main/App";
@@ -227,6 +229,23 @@ export function useEditor() {
         });
     }
 
+    function removeFamily(family: Family) {
+        RemoveFamily(family).then((newSaveFile: SaveFile) => {
+            // Since the edges may have changed following the Family's removal, reload the frontend state from the
+            // received saveFile
+            loadSaveFile(newSaveFile);
+        });
+    }
+
+    function addFamily(family: Family) {
+        console.log(family);
+        AddFamily(family).then((newSaveFile: SaveFile) => {
+            // Since the edges may have changed following the Family's addition, reload the frontend state from the
+            // received saveFile
+            loadSaveFile(newSaveFile);
+        });
+    }
+
     const saveSaveFile = debounce(() => {
         isSaving.value = true;
 
@@ -307,5 +326,7 @@ export function useEditor() {
         isSaving,
         addPerson,
         removeSelectedPerson,
+        addFamily,
+        removeFamily,
     };
 }
