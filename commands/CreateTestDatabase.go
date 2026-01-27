@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	err := repositories.DatabaseRepo.Fetch("test-database.geniealogy")
+	err := repositories.DatabaseRepo.Fetch("test-database.lamp")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -31,7 +31,7 @@ func (a *App) LoadFile() (*models.SaveFile, error) {
 		Filters: []runtime.FileFilter{
 			{
 				DisplayName: "Geniealogy files",
-				Pattern:     "*.geniealogy",
+				Pattern:     "*.lamp",
 			},
 		},
 	})
@@ -77,7 +77,7 @@ func (a *App) NewFile() (*models.SaveFile, error) {
 		Filters: []runtime.FileFilter{
 			{
 				DisplayName: "Geniealogy files",
-				Pattern:     "*.geniealogy",
+				Pattern:     "*.lamp",
 			},
 		},
 	})

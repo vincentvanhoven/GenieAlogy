@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-var testDatabaseFilePath = "./testing.geniealogy"
+var testDatabaseFilePath = "./testing.lamp"
 
 func TestDatabaseRepository_Create(t *testing.T) {
 	ensureTestDatabaseDoesntExist(t)
