@@ -2,8 +2,8 @@
 CREATE TABLE families
 (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    person_1_id INTEGER,
-    person_2_id INTEGER,
+    male_id INTEGER,
+    female_id INTEGER,
     position_x  INTEGER,
     position_y  INTEGER
 --     FOREIGN KEY (person_1_id) REFERENCES people (id) ON DELETE RESTRICT,

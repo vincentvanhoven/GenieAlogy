@@ -31,7 +31,7 @@ func (a *App) LoadFile() (*models.SaveFile, error) {
 		Filters: []runtime.FileFilter{
 			{
 				DisplayName: "Geniealogy files",
-				Pattern:     "*.geniealogy",
+				Pattern:     "*.lamp",
 			},
 		},
 	})
@@ -46,6 +46,52 @@ func (a *App) LoadFile() (*models.SaveFile, error) {
 	}
 
 	err = repositories.DatabaseRepo.Fetch(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	families, err := repositories.FamilyRepo.FetchAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	people, err := repositories.PersonRepo.FetchAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	saveFile := models.SaveFile{
+		people,
+		families,
+	}
+
+	// Keep track of open file/project path
+	a.openFilePath = path
+
+	return &saveFile, nil
+}
+
+func (a *App) NewFile() (*models.SaveFile, error) {
+	// Open file picker
+	path, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
+		Filters: []runtime.FileFilter{
+			{
+				DisplayName: "Geniealogy files",
+				Pattern:     "*.lamp",
+			},
+		},
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Empty response if no file was chosen
+	if path == "" {
+		return nil, nil
+	}
+
+	err = repositories.DatabaseRepo.Create(path)
 	if err != nil {
 		log.Fatal(err)
 	}

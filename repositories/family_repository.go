@@ -25,8 +25,8 @@ func (repo *FamilyRepository) Create(f models.Family) (*int, error) {
 
 	// Attempt the execution of the prepared statement
 	result, err = transaction.Exec(
-		`INSERT INTO families (person_1_id, person_2_id, position_x, position_y) VALUES (?, ?, ?, ?)`,
-		f.Person1Id, f.Person2Id, f.PositionX, f.PositionY,
+		`INSERT INTO families (male_id, female_id, position_x, position_y) VALUES (?, ?, ?, ?)`,
+		f.MaleId, f.FemaleId, f.PositionX, f.PositionY,
 	)
 
 	// Rollback if anything went wrong
@@ -70,12 +70,12 @@ func (repo *FamilyRepository) Fetch(id int) (*models.Family, error) {
 
 	err := DatabaseRepo.DB.QueryRow(
 		`SELECT
-    		id, person_1_id, person_2_id, position_x, position_y
+    		id, male_id, female_id, position_x, position_y
          	FROM families
          	WHERE id = ?
 		`,
 		id,
-	).Scan(&f.Id, &f.Person1Id, &f.Person2Id, &f.PositionX, &f.PositionY)
+	).Scan(&f.Id, &f.MaleId, &f.FemaleId, &f.PositionX, &f.PositionY)
 
 	if err != nil {
 		return nil, err
@@ -95,7 +95,7 @@ func (repo *FamilyRepository) FetchAll() ([]models.Family, error) {
 
 	for rows.Next() {
 		var row models.Family
-		err := rows.Scan(&row.Id, &row.Person1Id, &row.Person2Id, &row.PositionX, &row.PositionY)
+		err := rows.Scan(&row.Id, &row.MaleId, &row.FemaleId, &row.PositionX, &row.PositionY)
 
 		if err != nil {
 			return f, err
@@ -115,7 +115,7 @@ func (repo *FamilyRepository) FetchForPerson(person models.Person) ([]models.Fam
 	var f []models.Family
 
 	rows, err := DatabaseRepo.DB.Query(
-		`SELECT * FROM families WHERE person_1_id = ? OR person_2_id = ?`,
+		`SELECT * FROM families WHERE male_id = ? OR female_id = ?`,
 		person.Id, person.Id,
 	)
 	if err != nil {
@@ -126,7 +126,7 @@ func (repo *FamilyRepository) FetchForPerson(person models.Person) ([]models.Fam
 
 	for rows.Next() {
 		var row models.Family
-		err := rows.Scan(&row.Id, &row.Person1Id, &row.Person2Id, &row.PositionX, &row.PositionY)
+		err := rows.Scan(&row.Id, &row.MaleId, &row.FemaleId, &row.PositionX, &row.PositionY)
 
 		if err != nil {
 			return f, err
@@ -151,8 +151,8 @@ func (repo *FamilyRepository) Update(f models.Family) error {
 
 	// Attempt the execution of the prepared statement
 	_, err = transaction.Exec(
-		`UPDATE families SET person_1_id = ?, person_2_id = ?, position_x = ?, position_y = ? WHERE id = ?`,
-		f.Person1Id, f.Person2Id, f.PositionX, f.PositionY, f.Id,
+		`UPDATE families SET male_id = ?, female_id = ?, position_x = ?, position_y = ? WHERE id = ?`,
+		f.MaleId, f.FemaleId, f.PositionX, f.PositionY, f.Id,
 	)
 
 	// Rollback if anything went wrong

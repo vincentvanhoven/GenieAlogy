@@ -136,26 +136,26 @@ export function useEditor() {
 
         edges.value = [
             ...saveFile.value.families.flatMap((family) => [
-                ...(family.person_1_id
+                ...(family.male_id
                     ? [
                           {
                               id: "family-" + family.id + "-male",
                               type: "smoothstep",
-                              source: "person-" + family.person_1_id,
+                              source: "person-" + family.male_id,
                               target: "family-" + family.id,
-                              targetHandle: "left",
+                              targetHandle: "right",
                               style: { strokeWidth: 2 },
                           },
                       ]
                     : []),
-                ...(family.person_2_id
+                ...(family.female_id
                     ? [
                           {
                               id: "family-" + family.id + "-female",
                               type: "smoothstep",
-                              source: "person-" + family.person_2_id,
+                              source: "person-" + family.female_id,
                               target: "family-" + family.id,
-                              targetHandle: "right",
+                              targetHandle: "left",
                               style: { strokeWidth: 2 },
                           },
                       ]

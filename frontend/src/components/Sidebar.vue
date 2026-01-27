@@ -184,7 +184,7 @@
 <script lang="ts" setup>
     import { Node } from "@vue-flow/core";
     import { models } from "../../wailsjs/go/models";
-    import { computed, ref, Ref } from "vue";
+    import { computed, ref, Ref, watch } from "vue";
     import { IMaskComponent } from "vue-imask";
     import Family = models.Family;
     import Person = models.Person;
@@ -221,18 +221,28 @@
     const partnerships = computed(() => {
         return props.families.filter((family) => {
             return (
-                family.person_1_id === props.selectedNode?.data.id ||
-                family.person_2_id === props.selectedNode?.data.id
+                family.male_id === props.selectedNode?.data.id ||
+                family.female_id === props.selectedNode?.data.id
             );
         });
     });
+
+    // Watchers
+    watch(
+        () => props.selectedNode,
+        (newValue, oldValue) => {
+            if (!newValue && !!oldValue) {
+                addingFamily.value = false;
+                newFamilyPartnerId.value = null;
+            }
+        },
+    );
 
     // Methods
     function formatFamily(family: Family): string {
         let parents = props.people.filter((person) => {
             return (
-                family.person_1_id === person.id ||
-                family.person_2_id === person.id
+                family.male_id === person.id || family.female_id === person.id
             );
         });
 
@@ -250,11 +260,11 @@
 
         let selfPerson: Person = props.selectedNode?.data;
         let newFamily: Family = {
-            person_1_id:
+            male_id:
                 selfPerson.sex == "male"
                     ? selfPerson.id
                     : newFamilyPartnerId.value,
-            person_2_id:
+            female_id:
                 selfPerson.sex == "male"
                     ? newFamilyPartnerId.value
                     : selfPerson.id,

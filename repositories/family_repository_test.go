@@ -36,7 +36,7 @@ func TestFamilyRepository_FetchForPerson(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	person, err := repositories.PersonRepo.Fetch(*families[0].Person1Id)
+	person, err := repositories.PersonRepo.Fetch(*families[0].MaleId)
 
 	if err != nil {
 		t.Fatal(err)
