@@ -50,9 +50,10 @@ func (repo *DatabaseRepository) Fetch(filePath string) error {
 
 	db.SetMaxOpenConns(1)
 	db.SetMaxIdleConns(1)
-	
+
 	repo.DB = db
-	return nil
+
+	return repo.Update()
 }
 
 func (repo *DatabaseRepository) Update() error {
