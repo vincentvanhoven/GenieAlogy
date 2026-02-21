@@ -62,8 +62,8 @@
         return {
             top: !!selfPerson.value.family_id,
             // TODO: Refactor this to be more dynamic
-            left: (hasSourceEdge && props.data.sex === "male") ?? false,
-            right: (hasSourceEdge && props.data.sex === "female") ?? false,
+            left: (hasSourceEdge && selfPerson.value.sex === "male") ?? false,
+            right: (hasSourceEdge && selfPerson.value.sex === "female") ?? false,
         };
     });
 </script>
