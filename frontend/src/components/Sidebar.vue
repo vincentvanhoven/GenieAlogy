@@ -80,19 +80,28 @@
                     />
                 </FloatLabel>
 
-                <!--
-                                <Divider align="left" type="solid"><b>Death</b></Divider>
+                <Divider align="left" type="solid"><b>Death</b></Divider>
 
-                                <FloatLabel variant="on" class="mb-4">
-                                    <label for="birthdate">Date of Birth</label>
-                                    <DatePicker id="birthdate" name="birthdate" dateFormat="yy-mm-dd" class="w-full" />
-                                </FloatLabel>
+                <FloatLabel variant="on" class="mb-4">
+                    <label for="deathdate">Date of Death</label>
+                    <DatePicker
+                        id="deathdate"
+                        name="deathdate"
+                        dateFormat="yy-mm-dd"
+                        class="w-full"
+                        :disabled="!saveFileStore.isEditingPerson"
+                    />
+                </FloatLabel>
 
-                                <FloatLabel variant="on" class="mb-4">
-                                    <label for="birthplace">Location of Birth</label>
-                                    <InputText id="birthplace" name="birthplace" class="w-full" />
-                                </FloatLabel>
-                -->
+                <FloatLabel variant="on" class="mb-4">
+                    <label for="deathplace">Location of Death</label>
+                    <InputText
+                        id="deathplace"
+                        name="deathplace"
+                        class="w-full"
+                        :disabled="!saveFileStore.isEditingPerson"
+                    />
+                </FloatLabel>
 
                 <Divider align="left" type="solid"><b>Family</b></Divider>
 

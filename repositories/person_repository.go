@@ -27,10 +27,10 @@ func (repo *PersonRepository) Create(p models.Person) (*int, error) {
 	// Attempt the execution of the prepared statement
 	result, err = transaction.Exec(
 		`INSERT INTO people (
-				sex, firstname, lastname, birthdate, birthplace, family_id, profile_picture, position_x, position_y
+				sex, firstname, lastname, birthdate, birthplace, family_id, profile_picture, position_x, position_y, deathplace, deathplace
 			)
-         	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyId, p.ProfilePicture, p.PositionX, p.PositionY,
+         	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyId, p.ProfilePicture, p.PositionX, p.PositionY, p.Deathdate, p.Deathplace,
 	)
 
 	// Rollback if anything went wrong
@@ -74,7 +74,7 @@ func (repo *PersonRepository) Fetch(id int) (*models.Person, error) {
 
 	err := DatabaseRepo.DB.
 		QueryRow(`SELECT * FROM people WHERE id = ?`, id).
-		Scan(&p.Id, &p.Sex, &p.Firstname, &p.Lastname, &p.Birthdate, &p.Birthplace, &p.FamilyId, &p.ProfilePicture, &p.PositionX, &p.PositionY)
+		Scan(&p.Id, &p.Sex, &p.Firstname, &p.Lastname, &p.Birthdate, &p.Birthplace, &p.FamilyId, &p.ProfilePicture, &p.PositionX, &p.PositionY, &p.Deathdate, &p.Deathplace)
 
 	if err != nil {
 		return nil, err
@@ -105,6 +105,8 @@ func (repo *PersonRepository) FetchAll() ([]models.Person, error) {
 			&row.ProfilePicture,
 			&row.PositionX,
 			&row.PositionY,
+			&row.Deathdate,
+			&row.Deathplace,
 		)
 
 		if err != nil {
@@ -132,10 +134,10 @@ func (repo *PersonRepository) Update(p models.Person) error {
 	_, err = transaction.Exec(
 		`
 			UPDATE people
-			SET sex=?, firstname=?, lastname=?, birthdate=?, birthplace=?, family_id=?, profile_picture=?, position_x=?, position_y=?
+			SET sex=?, firstname=?, lastname=?, birthdate=?, birthplace=?, family_id=?, profile_picture=?, position_x=?, position_y=?, deathdate=?, deathplace=?
 			WHERE id=?
 		`,
-		p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyId, p.ProfilePicture, p.PositionX, p.PositionY, p.Id,
+		p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyId, p.ProfilePicture, p.PositionX, p.PositionY, p.Id, p.Deathdate, p.Deathplace,
 	)
 
 	// Rollback if anything went wrong

@@ -11,4 +11,6 @@ type Person struct {
 	ProfilePicture *string `json:"profile_picture"`
 	PositionX      int     `json:"position_x"`
 	PositionY      int     `json:"position_y"`
+	Deathdate      *string `json:"deathdate"`
+	Deathplace     *string `json:"deathplace"`
 }

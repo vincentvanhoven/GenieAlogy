@@ -38,6 +38,8 @@ func TestPersonRepository_Create_Fetch(t *testing.T) {
 		nil,
 		0,
 		0,
+		seeders.Strptr("2020-01-01"),
+		seeders.Strptr("New Jersey"),
 	}
 
 	createdId, err := repositories.PersonRepo.Create(personCreateData)
@@ -72,6 +74,8 @@ func TestPersonRepository_Update_Fetch(t *testing.T) {
 		nil,
 		0,
 		0,
+		seeders.Strptr("2020-01-01"),
+		seeders.Strptr("New Jersey"),
 	}
 
 	createdId, err := repositories.PersonRepo.Create(personCreateData)
@@ -94,6 +98,8 @@ func TestPersonRepository_Update_Fetch(t *testing.T) {
 		nil,
 		1,
 		2,
+		seeders.Strptr("2021-01-01"),
+		seeders.Strptr("Las Vegas"),
 	}
 
 	err = repositories.PersonRepo.Update(personUpdateData)
@@ -125,6 +131,8 @@ func TestPersonRepository_Delete_Fetch(t *testing.T) {
 		nil,
 		0,
 		0,
+		seeders.Strptr("2020-01-01"),
+		seeders.Strptr("New Jersey"),
 	}
 
 	createdId, err := repositories.PersonRepo.Create(personCreateData)
@@ -165,6 +173,8 @@ func TestPersonRepository_ClearFamily(t *testing.T) {
 			nil,
 			0,
 			0,
+			seeders.Strptr("2020-01-01"),
+			seeders.Strptr("New Jersey"),
 		}
 
 		createdId, err := repositories.PersonRepo.Create(personCreateData)
