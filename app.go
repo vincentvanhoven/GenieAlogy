@@ -132,6 +132,11 @@ func (a *App) AddPerson(position_x int, position_y int) (*models.Person, error) 
 	return person, err
 }
 
+func (a *App) UpdatePerson(person models.Person) error {
+	err := repositories.PersonRepo.Update(person)
+	return err
+}
+
 func (a *App) RemovePerson(person models.Person) (*models.SaveFile, error) {
 	families, err := repositories.FamilyRepo.FetchForPerson(person)
 

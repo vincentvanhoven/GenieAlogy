@@ -27,10 +27,10 @@ func (repo *PersonRepository) Create(p models.Person) (*int, error) {
 	// Attempt the execution of the prepared statement
 	result, err = transaction.Exec(
 		`INSERT INTO people (
-				sex, firstname, lastname, birthdate, birthplace, family_id, position_x, position_y
+				sex, firstname, lastname, birthdate, birthplace, family_id, profile_picture, position_x, position_y
 			)
-         	VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-		p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyId, p.PositionX, p.PositionY,
+         	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyId, p.ProfilePicture, p.PositionX, p.PositionY,
 	)
 
 	// Rollback if anything went wrong
