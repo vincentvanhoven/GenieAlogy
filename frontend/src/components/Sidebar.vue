@@ -2,6 +2,7 @@
     <div class="w-full h-full max-h-screen border-l border-l-gray-300 shadow">
         <Form
             v-if="saveFileStore.selectedPerson"
+            :key="saveFileStore.selectedPerson.id"
             :initial-values="saveFileStore.selectedPerson"
             @submit="onSubmit"
             class="h-full max-h-full flex flex-col"
