@@ -27,7 +27,7 @@ func (repo *PersonRepository) Create(p models.Person) (*int, error) {
 	// Attempt the execution of the prepared statement
 	result, err = transaction.Exec(
 		`INSERT INTO people (
-				sex, firstname, lastname, birthdate, birthplace, family_id, profile_picture, position_x, position_y, deathplace, deathplace
+				sex, firstname, lastname, birthdate, birthplace, family_id, profile_picture, position_x, position_y, deathdate, deathplace
 			)
          	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyId, p.ProfilePicture, p.PositionX, p.PositionY, p.Deathdate, p.Deathplace,
@@ -137,7 +137,7 @@ func (repo *PersonRepository) Update(p models.Person) error {
 			SET sex=?, firstname=?, lastname=?, birthdate=?, birthplace=?, family_id=?, profile_picture=?, position_x=?, position_y=?, deathdate=?, deathplace=?
 			WHERE id=?
 		`,
-		p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyId, p.ProfilePicture, p.PositionX, p.PositionY, p.Id, p.Deathdate, p.Deathplace,
+		p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyId, p.ProfilePicture, p.PositionX, p.PositionY, p.Deathdate, p.Deathplace, p.Id,
 	)
 
 	// Rollback if anything went wrong
