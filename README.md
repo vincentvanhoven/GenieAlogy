@@ -20,6 +20,8 @@ When working with the source code (not the released binaries), please note that 
 | Running the tests                   | `go test -v ./...` |
 | Building the binaries               | To be added later  |
 
+If your build fails due to package `webkit2gtk-4.0` missing, add `-tags webkit2_41` to the build command.
+
 ## Development
 
 Please note that this software is in active development, and stability is not a focus until the first major release
