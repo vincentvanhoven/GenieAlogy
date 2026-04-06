@@ -222,7 +222,6 @@
     import { models } from "../../wailsjs/go/models";
     import Person = models.Person;
     import dayjs from "dayjs";
-    import { Preset } from "@primeuix/themes/types";
 
     // Data
     const saveFileStore = useSaveFileStore();
