@@ -1,0 +1,43 @@
+name: Wails build
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        build:
+          - name: 'GenieAlogy-linux'
+            platform: 'linux/amd64'
+            os: 'ubuntu-latest'
+          - name: 'GenieAlogy-windows'
+            platform: 'windows/amd64'
+            os: 'windows-latest'
+          - name: 'GenieAlogy-darwin'
+            platform: 'darwin/universal'
+            os: 'macos-latest'
+
+    runs-on: ${{ matrix.build.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Build wails
+        uses: dAppServer/wails-build-action@v2.2
+        id: build
+        with:
+          build-name: ${{ matrix.build.name }}
+          build-platform: ${{ matrix.build.platform }}
+          package: false
+          go-version: '1.24'
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.build.platform }}
+          path: build/bin/*
