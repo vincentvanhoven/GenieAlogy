@@ -4,6 +4,7 @@ import (
 	"GenieAlogy/repositories"
 	"context"
 	"log"
+	"strings"
 
 	"GenieAlogy/models"
 
@@ -89,6 +90,10 @@ func (a *App) NewFile() (*models.SaveFile, error) {
 	// Empty response if no file was chosen
 	if path == "" {
 		return nil, nil
+	}
+
+	if !strings.HasSuffix(path, ".lamp") {
+		path += ".lamp"
 	}
 
 	err = repositories.DatabaseRepo.Create(path)
@@ -205,6 +210,11 @@ func (a *App) AddFamily(family models.Family) (*models.SaveFile, error) {
 	}
 
 	return &saveFile, nil
+}
+
+func (a *App) UpdateFamily(family models.Family) error {
+	err := repositories.FamilyRepo.Update(family)
+	return err
 }
 
 func (a *App) RemoveFamily(family models.Family) (*models.SaveFile, error) {
