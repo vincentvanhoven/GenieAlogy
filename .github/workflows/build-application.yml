@@ -34,7 +34,7 @@ jobs:
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
       - name: Install Linux dependencies
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.build.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install -y \
