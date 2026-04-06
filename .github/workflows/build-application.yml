@@ -11,13 +11,13 @@ jobs:
       fail-fast: false
       matrix:
         build:
-          - name: 'GenieAlogy-linux'
+          - name: 'GenieAlogy-linux-amd64'
             platform: 'linux/amd64'
             os: 'ubuntu-latest'
-          - name: 'GenieAlogy-windows'
+          - name: 'GenieAlogy-windows-amd64.exe'
             platform: 'windows/amd64'
             os: 'windows-latest'
-          - name: 'GenieAlogy-darwin'
+          - name: 'GenieAlogy-darwin-universal.app'
             platform: 'darwin/universal'
             os: 'macos-latest'
 
@@ -34,7 +34,7 @@ jobs:
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
       - name: Install Linux dependencies
-        if: matrix.os == 'ubuntu-22.04'
+        if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -45,15 +45,15 @@ jobs:
 
       - name: Build
         run: |
-          if [[ "${{ matrix.os }}" == "ubuntu-22.04" ]]; then
-            wails build --platform linux/${{ matrix.arch }} -tags webkit2_41
-            mv build/bin/GenieAlogy build/bin/GenieAlogy-${{ github.ref_name }}-linux-${{ matrix.arch }}
-          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            wails build --platform darwin/${{ matrix.arch }}
-            mv build/bin/GenieAlogy.app build/bin/GenieAlogy-${{ github.ref_name }}-darwin-${{ matrix.arch }}.app
-          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            wails build --platform windows/${{ matrix.arch }}
-            mv build/bin/GenieAlogy.exe build/bin/GenieAlogy-${{ github.ref_name }}-windows-${{ matrix.arch }}.exe
+          if [[ "${{ matrix.build.os }}" == "ubuntu-latest" ]]; then
+            wails build --platform ${{ matrix.build.platform }} -tags webkit2_41
+            mv build/bin/GenieAlogy build/bin/${{ matrix.build.name }}
+          elif [[ "${{ matrix.build.os }}" == "macos-latest" ]]; then
+            wails build --platform ${{ matrix.build.platform }}
+            mv build/bin/GenieAlogy.app build/bin/${{ matrix.build.name }}
+          elif [[ "${{ matrix.build.os }}" == "windows-latest" ]]; then
+            wails build --platform ${{ matrix.build.platform }}
+            mv build/bin/GenieAlogy.exe build/bin/${{ matrix.build.name }}
           fi
         shell: bash
 
