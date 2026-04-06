@@ -1,4 +1,11 @@
 @import "tailwindcss";
+@import "tailwindcss-primeui";
+@import "primeicons/primeicons.css";
+
+html,
+body {
+    @apply bg-white;
+}
 
 /* these are necessary styles for vue flow */
 @import "@vue-flow/core/dist/style.css";
@@ -16,4 +23,8 @@
         @apply shadow-xl outline-2 outline-blue-400;
         @apply focus:outline-2 focus:outline-blue-400;
     }
+}
+
+.cursor-not-allowed > .vue-flow__viewport > .vue-flow__container {
+    cursor: not-allowed !important;
 }

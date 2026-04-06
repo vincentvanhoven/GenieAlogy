@@ -4,6 +4,7 @@ import (
 	"GenieAlogy/repositories"
 	"context"
 	"log"
+	"strings"
 
 	"GenieAlogy/models"
 
@@ -91,6 +92,10 @@ func (a *App) NewFile() (*models.SaveFile, error) {
 		return nil, nil
 	}
 
+	if !strings.HasSuffix(path, ".lamp") {
+		path += ".lamp"
+	}
+
 	err = repositories.DatabaseRepo.Create(path)
 	if err != nil {
 		log.Fatal(err)
@@ -130,6 +135,11 @@ func (a *App) AddPerson(position_x int, position_y int) (*models.Person, error) 
 
 	person, err := repositories.PersonRepo.Fetch(*createdId)
 	return person, err
+}
+
+func (a *App) UpdatePerson(person models.Person) error {
+	err := repositories.PersonRepo.Update(person)
+	return err
 }
 
 func (a *App) RemovePerson(person models.Person) (*models.SaveFile, error) {
@@ -200,6 +210,11 @@ func (a *App) AddFamily(family models.Family) (*models.SaveFile, error) {
 	}
 
 	return &saveFile, nil
+}
+
+func (a *App) UpdateFamily(family models.Family) error {
+	err := repositories.FamilyRepo.Update(family)
+	return err
 }
 
 func (a *App) RemoveFamily(family models.Family) (*models.SaveFile, error) {
