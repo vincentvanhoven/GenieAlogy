@@ -311,8 +311,7 @@ export const useSaveFileStore = defineStore("saveFile", () => {
 
     function getFamilyDisplayName(family: Family): string {
         return (
-            saveFile.value// Iterate all people
-            ?.people
+            saveFile.value?.people // Iterate all people
                 // Get the parents of this family
                 .filter(
                     (person) =>
