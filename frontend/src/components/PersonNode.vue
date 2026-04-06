@@ -3,26 +3,25 @@
         class="vue-flow__node-default node-root"
         :class="[selfPerson.sex === 'male' ? '!bg-blue-200' : '!bg-red-200']"
     >
-                <Handle
-                    type="target"
-                    :position="Position.Top"
-                    :class="{ invisible: !connectedHandles.top }"
-
-                />
-                <Handle
-                    v-if="selfPerson.sex === 'female'"
-                    type="source"
-                    id="right"
-                    :position="Position.Right"
-                    :class="{ invisible: !connectedHandles.right }"
-                />
-                <Handle
-                    v-else
-                    type="source"
-                    id="left"
-                    :position="Position.Left"
-                    :class="{ invisible: !connectedHandles.left }"
-                />
+        <Handle
+            type="target"
+            :position="Position.Top"
+            :class="{ invisible: !connectedHandles.top }"
+        />
+        <Handle
+            v-if="selfPerson.sex === 'female'"
+            type="source"
+            id="right"
+            :position="Position.Right"
+            :class="{ invisible: !connectedHandles.right }"
+        />
+        <Handle
+            v-else
+            type="source"
+            id="left"
+            :position="Position.Left"
+            :class="{ invisible: !connectedHandles.left }"
+        />
         <div
             class="h-full flex justify-center items-center text-sm font-semibold
                 bg-transparent"
@@ -63,7 +62,8 @@
             top: !!selfPerson.value.family_id,
             // TODO: Refactor this to be more dynamic
             left: (hasSourceEdge && selfPerson.value.sex === "male") ?? false,
-            right: (hasSourceEdge && selfPerson.value.sex === "female") ?? false,
+            right:
+                (hasSourceEdge && selfPerson.value.sex === "female") ?? false,
         };
     });
 </script>

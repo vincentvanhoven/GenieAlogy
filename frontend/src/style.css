@@ -1,8 +1,9 @@
 @import "tailwindcss";
 @import "tailwindcss-primeui";
-@import 'primeicons/primeicons.css';
+@import "primeicons/primeicons.css";
 
-html, body {
+html,
+body {
     @apply bg-white;
 }
 

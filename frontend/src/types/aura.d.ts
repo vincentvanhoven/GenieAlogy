@@ -1,1 +1,1 @@
-declare module '@primeuix/themes/aura';
+declare module "@primeuix/themes/aura";

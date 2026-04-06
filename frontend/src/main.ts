@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
-import PrimeVue from 'primevue/config';
-import Aura from '@primeuix/themes/aura';
+import PrimeVue from "primevue/config";
+import Aura from "@primeuix/themes/aura";
 import App from "./App.vue";
 import "./style.css";
 
@@ -13,12 +13,12 @@ app.use(PrimeVue, {
     theme: {
         preset: Aura,
         options: {
-            prefix: 'p',
+            prefix: "p",
             cssLayer: {
-                name: 'primevue',
-                order: 'theme, base, primevue'
-            }
-        }
-    }
-})
+                name: "primevue",
+                order: "theme, base, primevue",
+            },
+        },
+    },
+});
 app.mount("#app");

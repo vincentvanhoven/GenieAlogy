@@ -9,17 +9,21 @@
                 />
 
                 <VueFlow
-                    :title="saveFileStore.isEditingPerson ? 'Please finish editing in the sidebar first' : ''"
-                    :class="{'cursor-not-allowed' : saveFileStore.isEditingPerson }"
+                    :title="
+                        saveFileStore.isEditingPerson
+                            ? 'Please finish editing in the sidebar first'
+                            : ''
+                    "
+                    :class="{
+                        'cursor-not-allowed': saveFileStore.isEditingPerson,
+                    }"
                     class="relative w-full h-full"
                     v-model:nodes="saveFileStore.nodes"
                     v-model:edges="saveFileStore.edges"
                     @node-drag="saveFileStore.handleNodesSelectionDrag"
-
                     :elements-selectable="!saveFileStore.isEditingPerson"
                     :nodes-draggable="!saveFileStore.isEditingPerson"
                     :select-nodes-on-drag="!saveFileStore.isEditingPerson"
-
                     :nodes-connectable="false"
                     :snap-grid="[16, 16]"
                     :snap-to-grid="true"

@@ -1,5 +1,8 @@
 <template>
-    <div class="w-full h-full max-h-screen border-l border-l-gray-300 shadow text-sm">
+    <div
+        class="w-full h-full max-h-screen border-l border-l-gray-300 shadow
+            text-sm"
+    >
         <Form
             class="h-full max-h-full flex flex-col"
             v-if="saveFileStore.selectedPerson"
@@ -7,13 +10,18 @@
             :initial-values="saveFileStore.selectedPerson"
             @submit="onSubmit"
         >
-            <div class="px-4 py-2 border-b border-b-gray-200 flex justify-between">
+            <div
+                class="px-4 py-2 border-b border-b-gray-200 flex
+                    justify-between"
+            >
                 <h2 class="font-bold text-xl">Editor</h2>
 
                 <Button
                     label="Edit"
                     class="leading-4"
-                    :class="{'cursor-not-allowed' : saveFileStore.isEditingPerson }"
+                    :class="{
+                        'cursor-not-allowed': saveFileStore.isEditingPerson,
+                    }"
                     severity="contrast"
                     size="small"
                     :disabled="saveFileStore.isEditingPerson"
@@ -53,7 +61,10 @@
                         size="small"
                         id="sex"
                         name="sex"
-                        :options="[{ label: 'Male', value: 'male' }, { label: 'Female', value: 'female' }]"
+                        :options="[
+                            { label: 'Male', value: 'male' },
+                            { label: 'Female', value: 'female' },
+                        ]"
                         optionLabel="label"
                         optionValue="value"
                         class="w-full"
@@ -141,62 +152,77 @@
                 </Divider>
 
                 <DataTable :value="partnerships" dataKey="id">
-                    <template #empty>
-                        No partnerships
-                    </template>
+                    <template #empty> No partnerships </template>
 
                     <Column field="name" header="Name"></Column>
 
                     <Column>
                         <template #header>
-<!--                            <Button-->
-<!--                                :class="{'cursor-not-allowed' : !saveFileStore.isEditingPerson }"-->
-<!--                                :disabled="!saveFileStore.isEditingPerson"-->
-<!--                                severity="contrast"-->
-<!--                                size="small"-->
-<!--                                icon="pi pi-plus"-->
-<!--                                aria-label="Add"-->
-<!--                                class="p-1 w-6 h-6"-->
-<!--                            />-->
+                            <!--                            <Button-->
+                            <!--                                :class="{'cursor-not-allowed' : !saveFileStore.isEditingPerson }"-->
+                            <!--                                :disabled="!saveFileStore.isEditingPerson"-->
+                            <!--                                severity="contrast"-->
+                            <!--                                size="small"-->
+                            <!--                                icon="pi pi-plus"-->
+                            <!--                                aria-label="Add"-->
+                            <!--                                class="p-1 w-6 h-6"-->
+                            <!--                            />-->
                         </template>
 
                         <template #body>
-<!--                            <Button-->
-<!--                                :class="{'cursor-not-allowed' : !saveFileStore.isEditingPerson }"-->
-<!--                                :disabled="!saveFileStore.isEditingPerson"-->
-<!--                                severity="contrast"-->
-<!--                                size="small"-->
-<!--                                icon="pi pi-pencil"-->
-<!--                                aria-label="Edit"-->
-<!--                                class="p-1 w-6 h-6"-->
-<!--                            />-->
+                            <!--                            <Button-->
+                            <!--                                :class="{'cursor-not-allowed' : !saveFileStore.isEditingPerson }"-->
+                            <!--                                :disabled="!saveFileStore.isEditingPerson"-->
+                            <!--                                severity="contrast"-->
+                            <!--                                size="small"-->
+                            <!--                                icon="pi pi-pencil"-->
+                            <!--                                aria-label="Edit"-->
+                            <!--                                class="p-1 w-6 h-6"-->
+                            <!--                            />-->
                         </template>
                     </Column>
                 </DataTable>
             </div>
 
-            <div v-if="saveFileStore.isEditingPerson" class="px-4 py-2 border-t border-t-gray-200 flex justify-between">
-                <Button label="Cancel" class="leading-4" severity="danger" @click="cancelEdit" />
-                <Button type="submit" label="Save" class="leading-4"/>
+            <div
+                v-if="saveFileStore.isEditingPerson"
+                class="px-4 py-2 border-t border-t-gray-200 flex
+                    justify-between"
+            >
+                <Button
+                    label="Cancel"
+                    class="leading-4"
+                    severity="danger"
+                    @click="cancelEdit"
+                />
+                <Button type="submit" label="Save" class="leading-4" />
             </div>
         </Form>
 
         <template v-else>
             <div class="px-4 py-2">Select a person to edit</div>
         </template>
-
     </div>
 </template>
 
 <script lang="ts" setup>
     import { Form, FormSubmitEvent } from "@primevue/forms";
-    import { Button, DatePicker, Divider, FloatLabel, InputText, Select, DataTable, Column } from "primevue";
+    import {
+        Button,
+        DatePicker,
+        Divider,
+        FloatLabel,
+        InputText,
+        Select,
+        DataTable,
+        Column,
+    } from "primevue";
     import { useSaveFileStore } from "../stores/saveFileStore";
     import { computed } from "vue";
     import { models } from "../../wailsjs/go/models";
     import Person = models.Person;
     import dayjs from "dayjs";
-    import {Preset} from "@primeuix/themes/types";
+    import { Preset } from "@primeuix/themes/types";
 
     // Data
     const saveFileStore = useSaveFileStore();
@@ -205,17 +231,23 @@
     const familyOptions = computed(() => {
         return saveFileStore.families.map((family) => ({
             id: family.id,
-            name: saveFileStore.getFamilyDisplayName(family)
+            name: saveFileStore.getFamilyDisplayName(family),
         }));
     });
 
     // Methods
     function onSubmit(formSubmitEvent: FormSubmitEvent) {
-        let anyFieldsChanged = Object.values(formSubmitEvent.states).filter(value => value.dirty);
-        let payload: Person|null = anyFieldsChanged ? formSubmitEvent.values as Person : null
+        let anyFieldsChanged = Object.values(formSubmitEvent.states).filter(
+            (value) => value.dirty,
+        );
+        let payload: Person | null = anyFieldsChanged
+            ? (formSubmitEvent.values as Person)
+            : null;
 
         if (payload) {
-            payload.birthdate = payload.birthdate ? dayjs(payload.birthdate).format("YYYY-MM-DD") : undefined;
+            payload.birthdate = payload.birthdate
+                ? dayjs(payload.birthdate).format("YYYY-MM-DD")
+                : undefined;
         }
 
         saveFileStore.disableEditMode(payload);
@@ -235,19 +267,28 @@
                 );
             })
             .map((family) => {
-                let otherPersonId = family.male_id === saveFileStore.selectedPerson?.id ? family.female_id : family.male_id;
-                let otherPerson = saveFileStore.getPersonFromId(otherPersonId!)!;
+                let otherPersonId =
+                    family.male_id === saveFileStore.selectedPerson?.id
+                        ? family.female_id
+                        : family.male_id;
+                let otherPerson = saveFileStore.getPersonFromId(
+                    otherPersonId!,
+                )!;
 
                 return {
                     id: family.id,
                     name: saveFileStore.getPersonDisplayName(otherPerson),
-                    type: 'Unknown',
-                    start_date: '1900-01-01',
-                    end_date: '1900-01-01',
-                }
+                    type: "Unknown",
+                    start_date: "1900-01-01",
+                    end_date: "1900-01-01",
+                };
             });
     });
 
-    const birthdate = computed(() => new Date(saveFileStore.selectedPerson?.birthdate ?? ''))
-    const deathdate = computed(() => new Date(saveFileStore.selectedPerson?.deathdate ?? ''))
+    const birthdate = computed(
+        () => new Date(saveFileStore.selectedPerson?.birthdate ?? ""),
+    );
+    const deathdate = computed(
+        () => new Date(saveFileStore.selectedPerson?.deathdate ?? ""),
+    );
 </script>

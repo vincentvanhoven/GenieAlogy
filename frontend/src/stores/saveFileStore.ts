@@ -1,7 +1,28 @@
 import { defineStore } from "pinia";
-import { computed, ComputedRef, readonly, ref, Ref, WritableComputedRef } from "vue";
-import { Edge, GraphNode, MarkerType, Node, NodeSelectionChange, useVueFlow } from "@vue-flow/core";
-import { AddFamily, AddPerson, RemoveFamily, RemovePerson, UpdatePerson, UpdateFamily } from "../../wailsjs/go/main/App";
+import {
+    computed,
+    ComputedRef,
+    readonly,
+    ref,
+    Ref,
+    WritableComputedRef,
+} from "vue";
+import {
+    Edge,
+    GraphNode,
+    MarkerType,
+    Node,
+    NodeSelectionChange,
+    useVueFlow,
+} from "@vue-flow/core";
+import {
+    AddFamily,
+    AddPerson,
+    RemoveFamily,
+    RemovePerson,
+    UpdatePerson,
+    UpdateFamily,
+} from "../../wailsjs/go/main/App";
 import { models } from "../../wailsjs/go/models";
 import { EventsOn } from "../../wailsjs/runtime";
 import SaveFile = models.SaveFile;
@@ -27,8 +48,13 @@ export const useSaveFileStore = defineStore("saveFile", () => {
     let isEditingPerson: Ref<boolean> = ref(false);
 
     // Composables
-    const { getSelectedNodes, addSelectedNodes, onNodesChange, getViewport, project } =
-        useVueFlow();
+    const {
+        getSelectedNodes,
+        addSelectedNodes,
+        onNodesChange,
+        getViewport,
+        project,
+    } = useVueFlow();
 
     // Computed properties
     const hasLoadedSaveFile: ComputedRef<boolean> = computed(() => {
@@ -50,7 +76,7 @@ export const useSaveFileStore = defineStore("saveFile", () => {
                 let person = getPersonFromNode(selectedNode.value);
 
                 if (person) {
-                    Object.assign(person, {...updateValue})
+                    Object.assign(person, { ...updateValue });
                 }
             }
         },
@@ -63,10 +89,14 @@ export const useSaveFileStore = defineStore("saveFile", () => {
         // Event listeners
         onNodesChange((changes) => {
             // Update selectedNodes
-            let selectChanges = changes.filter((change) => Object.hasOwn(change, "selected"));
+            let selectChanges = changes.filter((change) =>
+                Object.hasOwn(change, "selected"),
+            );
 
             if (selectChanges.length > 0 && !isEditingPerson.value) {
-                selectChanges.forEach(change => onNodeSelected(change as NodeSelectionChange));
+                selectChanges.forEach((change) =>
+                    onNodeSelected(change as NodeSelectionChange),
+                );
             }
         });
 
@@ -83,14 +113,14 @@ export const useSaveFileStore = defineStore("saveFile", () => {
         if (change.selected) {
             // Find the node that was selected
             let selectedNode = nodes.value.find(
-                (node) => node.id === change.id
+                (node) => node.id === change.id,
             ) as Node;
             // Add it to the array of selected nodes
             selectedNodes.value.push(selectedNode);
         } else {
             // Find the node that was deselected
             const index = selectedNodes.value.findIndex(
-                (node) => node.id === change.id
+                (node) => node.id === change.id,
             );
             // Remote it from the array of selected nodes
             if (index !== -1) {
@@ -112,15 +142,15 @@ export const useSaveFileStore = defineStore("saveFile", () => {
             ...saveFile.value.people.map((person) => ({
                 id: "person-" + person.id,
                 type: "person",
-                position: { x: person.position_x, y: person.position_y }
+                position: { x: person.position_x, y: person.position_y },
             })),
             // Family nodes
             ...saveFile.value.families.map((family) => ({
                 id: "family-" + family.id,
                 type: "family",
                 position: { x: family.position_x, y: family.position_y },
-                origin: [12.5, 12.5]
-            }))
+                origin: [12.5, 12.5],
+            })),
         ];
 
         // Reset the edges
@@ -135,15 +165,15 @@ export const useSaveFileStore = defineStore("saveFile", () => {
                     type: "smoothstep",
                     source: "person-" + family.male_id,
                     target: "family-" + family.id,
-                    style: { strokeWidth: 2 }
+                    style: { strokeWidth: 2 },
                 },
                 {
                     id: `family-${family.id}-female`,
                     type: "smoothstep",
                     source: "person-" + family.female_id,
                     target: "family-" + family.id,
-                    style: { strokeWidth: 2 }
-                }
+                    style: { strokeWidth: 2 },
+                },
             ]),
             // Family edges
             ...saveFile.value.people
@@ -155,9 +185,9 @@ export const useSaveFileStore = defineStore("saveFile", () => {
                     target: "person-" + person.id,
                     markerEnd: {
                         type: MarkerType.ArrowClosed,
-                        color: "black"
-                    }
-                }))
+                        color: "black",
+                    },
+                })),
         ];
     }
 
@@ -165,7 +195,7 @@ export const useSaveFileStore = defineStore("saveFile", () => {
         // screen center coordinates
         const centerScreen = {
             x: gridCanvas.value!.getBoundingClientRect().width / 2,
-            y: gridCanvas.value!.getBoundingClientRect().height / 2
+            y: gridCanvas.value!.getBoundingClientRect().height / 2,
         };
         // convert to graph coordinates
         const centerGraph = project(centerScreen);
@@ -173,12 +203,12 @@ export const useSaveFileStore = defineStore("saveFile", () => {
         const position = {
             x:
                 Math.round(
-                    (centerGraph.x - personNodeDimensions.x / 2) / gridSize
+                    (centerGraph.x - personNodeDimensions.x / 2) / gridSize,
                 ) * gridSize,
             y:
                 Math.round(
-                    (centerGraph.y - personNodeDimensions.y / 2) / gridSize
-                ) * gridSize
+                    (centerGraph.y - personNodeDimensions.y / 2) / gridSize,
+                ) * gridSize,
         };
 
         AddPerson(position.x, position.y).then((person) => {
@@ -187,7 +217,7 @@ export const useSaveFileStore = defineStore("saveFile", () => {
             nodes.value.push({
                 id: "person-" + person.id,
                 type: "person",
-                position: { x: person.position_x, y: person.position_y }
+                position: { x: person.position_x, y: person.position_y },
             });
         });
     }
@@ -219,14 +249,14 @@ export const useSaveFileStore = defineStore("saveFile", () => {
             let positionData = {
                 position_x: selectedNode.position.x,
                 position_y: selectedNode.position.y,
-            }
+            };
 
             try {
                 if (person) {
-                    let updatePayload = {...person, ...positionData};
+                    let updatePayload = { ...person, ...positionData };
                     await UpdatePerson(updatePayload);
                 } else if (family) {
-                    let updatePayload = {...family, ...positionData};
+                    let updatePayload = { ...family, ...positionData };
                     await UpdateFamily(updatePayload);
                 }
             } catch (exception) {
@@ -250,7 +280,9 @@ export const useSaveFileStore = defineStore("saveFile", () => {
     }
 
     function getPersonFromId(id: number): Person | null {
-        return saveFile.value?.people.find((person) => person.id === +id) ?? null;
+        return (
+            saveFile.value?.people.find((person) => person.id === +id) ?? null
+        );
     }
 
     function getPersonDisplayName(person: Person) {
@@ -272,19 +304,26 @@ export const useSaveFileStore = defineStore("saveFile", () => {
     }
 
     function getFamilyFromId(id: number): Family | null {
-        return saveFile.value?.families.find((family) => family.id === +id) ?? null;
+        return (
+            saveFile.value?.families.find((family) => family.id === +id) ?? null
+        );
     }
 
     function getFamilyDisplayName(family: Family): string {
-        return saveFile.value
-            // Iterate all people
+        return (
+            saveFile.value// Iterate all people
             ?.people
-            // Get the parents of this family
-            .filter(person => family.male_id === person.id || family.female_id === person.id)
-            // Format their names
-            .map(person => getPersonDisplayName(person))
-            // Join their names into one string
-            .join(" - ") ?? "";
+                // Get the parents of this family
+                .filter(
+                    (person) =>
+                        family.male_id === person.id ||
+                        family.female_id === person.id,
+                )
+                // Format their names
+                .map((person) => getPersonDisplayName(person))
+                // Join their names into one string
+                .join(" - ") ?? ""
+        );
     }
 
     function enableEditMode() {
@@ -296,11 +335,10 @@ export const useSaveFileStore = defineStore("saveFile", () => {
         // 'Lock' the graph view for selection changes
         isEditingPerson.value = true;
         // 'Lock' the selected styling of the active Node
-        selectedNode.value!.class = 'selected';
+        selectedNode.value!.class = "selected";
     }
 
-
-    async function disableEditMode(changedFields: Person|null = null) {
+    async function disableEditMode(changedFields: Person | null = null) {
         // Ensure that Person edit mode is active
         if (!isEditingPerson.value) {
             return;
@@ -308,7 +346,10 @@ export const useSaveFileStore = defineStore("saveFile", () => {
 
         if (changedFields) {
             try {
-                let updatePayload = { ...selectedPerson.value, ...changedFields };
+                let updatePayload = {
+                    ...selectedPerson.value,
+                    ...changedFields,
+                };
                 await UpdatePerson(updatePayload);
                 selectedPerson.value = updatePayload;
             } catch (exception) {
@@ -319,12 +360,12 @@ export const useSaveFileStore = defineStore("saveFile", () => {
         // Ensure that VueFlow selected states are in line with the manually
         // forced selection of selectedNode (it may have gotten deselected under
         // the VueFlow hood)
-        addSelectedNodes([selectedNode.value! as GraphNode])
+        addSelectedNodes([selectedNode.value! as GraphNode]);
 
         // 'Unlock' the graph view for selection changes
         isEditingPerson.value = false;
         // 'Unlock' the selected styling of the active Node
-        selectedNode.value!.class = '';
+        selectedNode.value!.class = "";
     }
 
     return {
