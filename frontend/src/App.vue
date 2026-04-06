@@ -9,6 +9,7 @@
                 />
 
                 <VueFlow
+                    :title="saveFileStore.isEditingPerson ? 'Please finish editing in the sidebar first' : ''"
                     :class="{'cursor-not-allowed' : saveFileStore.isEditingPerson }"
                     class="relative w-full h-full"
                     v-model:nodes="saveFileStore.nodes"
@@ -83,10 +84,6 @@
 
     // Event listeners
     onMounted(() => saveFileStore.init(gridCanvas.value!));
-
-    function test() {
-        console.log('abc');
-    }
 
     // Watchers
     watch(
