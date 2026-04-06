@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { computed, ComputedRef, readonly, ref, Ref, WritableComputedRef } from "vue";
 import { Edge, GraphNode, MarkerType, Node, NodeSelectionChange, useVueFlow } from "@vue-flow/core";
-import { AddFamily, AddPerson, RemoveFamily, RemovePerson, UpdatePerson } from "../../wailsjs/go/main/App";
+import { AddFamily, AddPerson, RemoveFamily, RemovePerson, UpdatePerson, UpdateFamily } from "../../wailsjs/go/main/App";
 import { models } from "../../wailsjs/go/models";
 import { EventsOn } from "../../wailsjs/runtime";
 import SaveFile = models.SaveFile;
@@ -212,9 +212,26 @@ export const useSaveFileStore = defineStore("saveFile", () => {
     }
 
     function handleNodesSelectionDrag({ node, event }: any): void {
-        getSelectedNodes.value.forEach((selectedNode) => {
-            selectedNode.data.position_x = selectedNode.position.x;
-            selectedNode.data.position_y = selectedNode.position.y;
+        getSelectedNodes.value.forEach(async (selectedNode) => {
+            let person = getPersonFromNode(selectedNode);
+            let family = getFamilyFromNode(selectedNode);
+
+            let positionData = {
+                position_x: selectedNode.position.x,
+                position_y: selectedNode.position.y,
+            }
+
+            try {
+                if (person) {
+                    let updatePayload = {...person, ...positionData};
+                    await UpdatePerson(updatePayload);
+                } else if (family) {
+                    let updatePayload = {...family, ...positionData};
+                    await UpdateFamily(updatePayload);
+                }
+            } catch (exception) {
+                // console.log(exception);
+            }
         });
     }
 
@@ -228,12 +245,34 @@ export const useSaveFileStore = defineStore("saveFile", () => {
             return null;
         }
 
-        // Find and return the coresponding Person
+        // Find and return the corresponding Person
+        return getPersonFromId(+id);
+    }
+
+    function getPersonFromId(id: number): Person | null {
         return saveFile.value?.people.find((person) => person.id === +id) ?? null;
     }
 
     function getPersonDisplayName(person: Person) {
         return `${person.firstname ?? "Onbekend"} ${person.lastname ?? ""} (${person.id})`;
+    }
+
+    function getFamilyFromNode(node: Node | string): Family | null {
+        // Get the family ID from the Node id
+        let id = typeof node === "object" ? node.id : node;
+        id = id.replace("family-", "");
+
+        // Assert the result is numerical
+        if (id === "" || Number.isNaN(+id)) {
+            return null;
+        }
+
+        // Find and return the corresponding Person
+        return getFamilyFromId(+id);
+    }
+
+    function getFamilyFromId(id: number): Family | null {
+        return saveFile.value?.families.find((family) => family.id === +id) ?? null;
     }
 
     function getFamilyDisplayName(family: Family): string {
@@ -305,6 +344,7 @@ export const useSaveFileStore = defineStore("saveFile", () => {
         addFamily,
         removeFamily,
         getPersonFromNode,
+        getPersonFromId,
         getPersonDisplayName,
         getFamilyDisplayName,
         enableEditMode,
