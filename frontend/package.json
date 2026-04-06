@@ -17,6 +17,7 @@
     "@vue-flow/core": "^1.48.0",
     "dayjs": "^1.11.19",
     "pinia": "^3.0.4",
+    "primeicons": "^7.0.0",
     "primevue": "^4.5.4",
     "tailwindcss": "^4.1.18",
     "tailwindcss-primeui": "^0.6.1",
