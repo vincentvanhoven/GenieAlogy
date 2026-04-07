@@ -23,6 +23,6 @@ jobs:
 
       - name: Run tests
         run: |
+          go run tool golang.org/x/vuln/cmd/govulncheck ./...
           cd frontend
           npm audit
-          go run tool golang.org/x/vuln/cmd/govulncheck ./...
