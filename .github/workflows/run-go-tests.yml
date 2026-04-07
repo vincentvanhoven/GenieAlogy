@@ -14,7 +14,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          go-version: 1.24.0
+          go-version: 1.26.1
       - name: Run tests
         # The application tries to embed al files under frontend/dist, and fails if there are none
         run: |

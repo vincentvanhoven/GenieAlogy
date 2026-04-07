@@ -1,6 +1,6 @@
 module GenieAlogy
 
-go 1.24.0
+go 1.26.1
 
 require (
 	github.com/pressly/goose/v3 v3.26.0
