@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import {
     computed,
-    ComputedRef,
+    ComputedRef, nextTick,
     readonly,
     ref,
     Ref,
@@ -484,8 +484,10 @@ export const useSaveFileStore = defineStore("saveFile", () => {
                 await UpdatePerson(updatePayload);
                 selectedPerson.value = updatePayload;
 
-                // Recompute the edges
-                recomputeEdges();
+                nextTick(() => {
+                    // Recompute the edges
+                    recomputeEdges();
+                });
             } catch (exception) {
                 // console.log(exception);
             }

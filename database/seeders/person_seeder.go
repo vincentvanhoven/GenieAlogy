@@ -21,6 +21,7 @@ func RunPeopleSeeder() {
 			0,
 			Strptr("2020-01-01"),
 			Strptr("New Jersey"),
+			Strptr("top"),
 		},
 		{
 			nil,
@@ -35,6 +36,7 @@ func RunPeopleSeeder() {
 			0,
 			Strptr("2020-01-01"),
 			Strptr("New Jersey"),
+			Strptr("top"),
 		},
 		{
 			nil,
@@ -49,6 +51,7 @@ func RunPeopleSeeder() {
 			0,
 			Strptr("2020-01-01"),
 			Strptr("New Jersey"),
+			Strptr("top"),
 		},
 		{
 			nil,
@@ -63,6 +66,7 @@ func RunPeopleSeeder() {
 			0,
 			Strptr("2020-01-01"),
 			Strptr("New Jersey"),
+			Strptr("top"),
 		},
 		{
 			nil,
@@ -77,6 +81,7 @@ func RunPeopleSeeder() {
 			0,
 			Strptr("2020-01-01"),
 			Strptr("New Jersey"),
+			Strptr("top"),
 		},
 		{
 			nil,
@@ -91,6 +96,7 @@ func RunPeopleSeeder() {
 			0,
 			Strptr("2020-01-01"),
 			Strptr("New Jersey"),
+			Strptr("top"),
 		},
 	}
 

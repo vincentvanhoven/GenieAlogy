@@ -27,10 +27,10 @@ func (repo *PersonRepository) Create(p models.Person) (*int, error) {
 	// Attempt the execution of the prepared statement
 	result, err = transaction.Exec(
 		`INSERT INTO people (
-				sex, firstname, lastname, birthdate, birthplace, family_id, profile_picture, position_x, position_y, deathdate, deathplace
+				sex, firstname, lastname, birthdate, birthplace, family_id, profile_picture, position_x, position_y, deathdate, deathplace, parent_arrow_position
 			)
-         	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyId, p.ProfilePicture, p.PositionX, p.PositionY, p.Deathdate, p.Deathplace,
+         	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyId, p.ProfilePicture, p.PositionX, p.PositionY, p.Deathdate, p.Deathplace, p.ParentArrowPosition,
 	)
 
 	// Rollback if anything went wrong
@@ -74,7 +74,7 @@ func (repo *PersonRepository) Fetch(id int) (*models.Person, error) {
 
 	err := DatabaseRepo.DB.
 		QueryRow(`SELECT * FROM people WHERE id = ?`, id).
-		Scan(&p.Id, &p.Sex, &p.Firstname, &p.Lastname, &p.Birthdate, &p.Birthplace, &p.FamilyId, &p.ProfilePicture, &p.PositionX, &p.PositionY, &p.Deathdate, &p.Deathplace)
+		Scan(&p.Id, &p.Sex, &p.Firstname, &p.Lastname, &p.Birthdate, &p.Birthplace, &p.FamilyId, &p.ProfilePicture, &p.PositionX, &p.PositionY, &p.Deathdate, &p.Deathplace, &p.ParentArrowPosition)
 
 	if err != nil {
 		return nil, err
@@ -107,6 +107,7 @@ func (repo *PersonRepository) FetchAll() ([]models.Person, error) {
 			&row.PositionY,
 			&row.Deathdate,
 			&row.Deathplace,
+			&row.ParentArrowPosition,
 		)
 
 		if err != nil {
@@ -151,6 +152,7 @@ func (repo *PersonRepository) FetchForFamily(family models.Family) ([]models.Per
 			&row.PositionY,
 			&row.Deathdate,
 			&row.Deathplace,
+			&row.ParentArrowPosition,
 		)
 
 		if err != nil {
@@ -178,10 +180,10 @@ func (repo *PersonRepository) Update(p models.Person) error {
 	_, err = transaction.Exec(
 		`
 			UPDATE people
-			SET sex=?, firstname=?, lastname=?, birthdate=?, birthplace=?, family_id=?, profile_picture=?, position_x=?, position_y=?, deathdate=?, deathplace=?
+			SET sex=?, firstname=?, lastname=?, birthdate=?, birthplace=?, family_id=?, profile_picture=?, position_x=?, position_y=?, deathdate=?, deathplace=?, parent_arrow_position=?
 			WHERE id=?
 		`,
-		p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyId, p.ProfilePicture, p.PositionX, p.PositionY, p.Deathdate, p.Deathplace, p.Id,
+		p.Sex, p.Firstname, p.Lastname, p.Birthdate, p.Birthplace, p.FamilyId, p.ProfilePicture, p.PositionX, p.PositionY, p.Deathdate, p.Deathplace, p.ParentArrowPosition, p.Id,
 	)
 
 	// Rollback if anything went wrong
@@ -220,17 +222,18 @@ func (repo *PersonRepository) Anonimize(p models.Person) error {
 	unknown := "Unknown"
 
 	return repo.Update(models.Person{
-		Id:             p.Id,
-		Sex:            p.Sex,
-		Firstname:      &unknown,
-		Lastname:       nil,
-		Birthdate:      nil,
-		Birthplace:     nil,
-		FamilyId:       p.FamilyId,
-		ProfilePicture: nil,
-		PositionX:      p.PositionX,
-		PositionY:      p.PositionY,
-		Deathdate:      nil,
-		Deathplace:     nil,
+		Id:                  p.Id,
+		Sex:                 p.Sex,
+		Firstname:           &unknown,
+		Lastname:            nil,
+		Birthdate:           nil,
+		Birthplace:          nil,
+		FamilyId:            p.FamilyId,
+		ProfilePicture:      nil,
+		PositionX:           p.PositionX,
+		PositionY:           p.PositionY,
+		Deathdate:           nil,
+		Deathplace:          nil,
+		ParentArrowPosition: p.ParentArrowPosition,
 	})
 }

@@ -155,10 +155,24 @@
                         :options="familyOptions"
                         optionLabel="name"
                         optionValue="id"
-                        class="w-full"
+                        class="w-full mb-4"
                         :disabled="!saveFileStore.isEditingPerson"
                     />
                     <label for="family_id">Parents</label>
+                </FloatLabel>
+
+                 <FloatLabel variant="on">
+                    <Select
+                        size="small"
+                        id="parent_arrow_position"
+                        name="parent_arrow_position"
+                        :options="[{name: 'Top', value: 'top'}, {name: 'Left', value: 'left'}, {name: 'Right', value:'right'}]"
+                        optionLabel="label"
+                        optionValue="value"
+                        class="w-full"
+                        :disabled="!saveFileStore.isEditingPerson"
+                    />
+                    <label for="parent_arrow_position">Arrow position</label>
                 </FloatLabel>
 
                 <Divider align="left" type="solid" class="mb-0">
