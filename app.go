@@ -142,74 +142,72 @@ func (a *App) UpdatePerson(person models.Person) error {
 	return err
 }
 
-func (a *App) RemovePerson(person models.Person) (*models.SaveFile, error) {
+func (a *App) RemovePerson(person models.Person) (*models.Person, error) {
 	families, err := repositories.FamilyRepo.FetchForPerson(person)
 
 	if err != nil {
 		return nil, err
 	}
 
+	hasDescendants := false
+
+	// First, a soft-run to see if the Person has descendants.
 	for _, family := range families {
-		err = repositories.FamilyRepo.Delete(*family.Id)
-
+		people, err := repositories.PersonRepo.FetchForFamily(family)
 		if err != nil {
 			return nil, err
 		}
 
-		err = repositories.PersonRepo.ClearFamily(*family.Id)
-
-		if err != nil {
-			return nil, err
+		if len(people) > 0 {
+			hasDescendants = true
 		}
 	}
 
-	err = repositories.PersonRepo.Delete(*person.Id)
+	if hasDescendants {
+		// To prevent breaking the tree when there are descendants, anonymize the Person instead
+		err = repositories.PersonRepo.Anonimize(person)
+		if err != nil {
+			return nil, err
+		}
 
-	if err != nil {
-		return nil, err
+		p, err := repositories.PersonRepo.Fetch(*person.Id)
+		if err != nil {
+			return p, err
+		}
+
+		// Return the anonymized Person
+		return p, nil
+	} else {
+		// Iterate familes
+		for _, family := range families {
+			err := repositories.FamilyRepo.Delete(*family.Id)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		err = repositories.PersonRepo.Delete(*person.Id)
+		if err != nil {
+			return nil, err
+		}
+
+		return nil, nil
 	}
-
-	families, err = repositories.FamilyRepo.FetchAll()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	people, err := repositories.PersonRepo.FetchAll()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	saveFile := models.SaveFile{
-		people,
-		families,
-	}
-
-	return &saveFile, nil
 }
 
-func (a *App) AddFamily(family models.Family) (*models.SaveFile, error) {
-	_, err := repositories.FamilyRepo.Create(family)
+func (a *App) AddFamily(family models.Family) (*models.Family, error) {
+	id, err := repositories.FamilyRepo.Create(family)
 
 	if err != nil {
 		return nil, err
 	}
 
-	families, err := repositories.FamilyRepo.FetchAll()
+	f, err := repositories.FamilyRepo.Fetch(*id)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	people, err := repositories.PersonRepo.FetchAll()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	saveFile := models.SaveFile{
-		people,
-		families,
-	}
-
-	return &saveFile, nil
+	return f, nil
 }
 
 func (a *App) UpdateFamily(family models.Family) error {
@@ -217,35 +215,20 @@ func (a *App) UpdateFamily(family models.Family) error {
 	return err
 }
 
-func (a *App) RemoveFamily(family models.Family) (*models.SaveFile, error) {
-	err := repositories.FamilyRepo.Delete(*family.Id)
+func (a *App) RemoveFamily(family models.Family) error {
+	err := repositories.PersonRepo.ClearFamily(*family.Id)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	err = repositories.PersonRepo.ClearFamily(*family.Id)
+	err = repositories.FamilyRepo.Delete(*family.Id)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	families, err := repositories.FamilyRepo.FetchAll()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	people, err := repositories.PersonRepo.FetchAll()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	saveFile := models.SaveFile{
-		people,
-		families,
-	}
-
-	return &saveFile, nil
+	return nil
 }
 
 func (a *App) SaveFile(saveFile models.SaveFile) error {

@@ -123,6 +123,50 @@ func (repo *PersonRepository) FetchAll() ([]models.Person, error) {
 	return p, nil
 }
 
+func (repo *PersonRepository) FetchForFamily(family models.Family) ([]models.Person, error) {
+	var p []models.Person
+
+	rows, err := DatabaseRepo.DB.Query(
+		`SELECT * FROM people WHERE family_id = ?`,
+		family.Id,
+	)
+	if err != nil {
+		return p, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var row models.Person
+		err := rows.Scan(
+			&row.Id,
+			&row.Sex,
+			&row.Firstname,
+			&row.Lastname,
+			&row.Birthdate,
+			&row.Birthplace,
+			&row.FamilyId,
+			&row.ProfilePicture,
+			&row.PositionX,
+			&row.PositionY,
+			&row.Deathdate,
+			&row.Deathplace,
+		)
+
+		if err != nil {
+			return p, err
+		}
+		p = append(p, row)
+	}
+
+	// check for errors after iteration
+	if err = rows.Err(); err != nil {
+		return p, err
+	}
+
+	return p, nil
+}
+
 func (repo *PersonRepository) Update(p models.Person) error {
 	// Open transaction
 	transaction, err := DatabaseRepo.DB.Begin()
@@ -170,4 +214,23 @@ func (repo *PersonRepository) ClearFamily(family_id int) error {
 	)
 
 	return err
+}
+
+func (repo *PersonRepository) Anonimize(p models.Person) error {
+	unknown := "Unknown"
+
+	return repo.Update(models.Person{
+		Id:             p.Id,
+		Sex:            p.Sex,
+		Firstname:      &unknown,
+		Lastname:       nil,
+		Birthdate:      nil,
+		Birthplace:     nil,
+		FamilyId:       p.FamilyId,
+		ProfilePicture: nil,
+		PositionX:      p.PositionX,
+		PositionY:      p.PositionY,
+		Deathdate:      nil,
+		Deathplace:     nil,
+	})
 }
