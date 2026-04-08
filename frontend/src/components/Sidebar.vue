@@ -198,7 +198,7 @@
                             />
                         </template>
 
-                        <template #body="{data}"">
+                        <template #body="{data}">
                             <Button
                                 :class="{'cursor-not-allowed' : !saveFileStore.isEditingPerson }"
                                 :disabled="!saveFileStore.isEditingPerson"
