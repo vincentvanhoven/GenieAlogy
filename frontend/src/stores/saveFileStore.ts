@@ -55,7 +55,6 @@ export const useSaveFileStore = defineStore("saveFile", () => {
         getSelectedNodes,
         addSelectedNodes,
         onNodesChange,
-        getViewport,
         project,
     } = useVueFlow();
 
