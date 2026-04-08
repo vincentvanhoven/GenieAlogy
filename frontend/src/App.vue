@@ -80,9 +80,9 @@
     import FamilyNode from "./components/FamilyNode.vue";
     import { onMounted, Ref, ref, watch } from "vue";
     import Sidebar from "./components/Sidebar.vue";
-    import DeletePerson from './components/dialogs/DeletePerson.vue';
-    import AddFamily from './components/dialogs/AddFamily.vue';
-    import DeleteFamily from './components/dialogs/DeleteFamily.vue';
+    import DeletePerson from "./components/dialogs/DeletePerson.vue";
+    import AddFamily from "./components/dialogs/AddFamily.vue";
+    import DeleteFamily from "./components/dialogs/DeleteFamily.vue";
     import { Background } from "@vue-flow/background";
     import { useSaveFileStore } from "./stores/saveFileStore";
 

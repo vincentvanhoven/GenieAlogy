@@ -21,11 +21,16 @@
                         label="Remove"
                         class="leading-4 mr-2"
                         :class="{
-                            'cursor-not-allowed': saveFileStore.isEditingPerson || saveFileStore.isDeletingPerson,
+                            'cursor-not-allowed':
+                                saveFileStore.isEditingPerson ||
+                                saveFileStore.isDeletingPerson,
                         }"
                         severity="danger"
                         size="small"
-                        :disabled="saveFileStore.isEditingPerson || saveFileStore.isDeletingPerson"
+                        :disabled="
+                            saveFileStore.isEditingPerson ||
+                            saveFileStore.isDeletingPerson
+                        "
                         @click="saveFileStore.enableDeletePersonMode"
                     />
 
@@ -161,12 +166,16 @@
                     <label for="family_id">Parents</label>
                 </FloatLabel>
 
-                 <FloatLabel variant="on">
+                <FloatLabel variant="on">
                     <Select
                         size="small"
                         id="parent_arrow_position"
                         name="parent_arrow_position"
-                        :options="[{name: 'Top', value: 'top'}, {name: 'Left', value: 'left'}, {name: 'Right', value:'right'}]"
+                        :options="[
+                            { name: 'Top', value: 'top' },
+                            { name: 'Left', value: 'left' },
+                            { name: 'Right', value: 'right' },
+                        ]"
                         optionLabel="label"
                         optionValue="value"
                         class="w-full"
@@ -187,7 +196,10 @@
                     <Column class="w-8">
                         <template #header>
                             <Button
-                                :class="{'cursor-not-allowed' : !saveFileStore.isEditingPerson }"
+                                :class="{
+                                    'cursor-not-allowed':
+                                        !saveFileStore.isEditingPerson,
+                                }"
                                 :disabled="!saveFileStore.isEditingPerson"
                                 severity="contrast"
                                 size="small"
@@ -198,9 +210,12 @@
                             />
                         </template>
 
-                        <template #body="{data}">
+                        <template #body="{ data }">
                             <Button
-                                :class="{'cursor-not-allowed' : !saveFileStore.isEditingPerson }"
+                                :class="{
+                                    'cursor-not-allowed':
+                                        !saveFileStore.isEditingPerson,
+                                }"
                                 :disabled="!saveFileStore.isEditingPerson"
                                 severity="danger"
                                 size="small"
@@ -221,7 +236,6 @@
                                 class="p-1 w-6 h-6"
                             />
                             -->
-
                         </template>
                     </Column>
                 </DataTable>
@@ -300,7 +314,9 @@
     }
 
     function removeFamily(familyId: number) {
-        let family = saveFileStore.families.find(family => family.id === familyId)!;
+        let family = saveFileStore.families.find(
+            (family) => family.id === familyId,
+        )!;
         saveFileStore.enableDeleteFamilyMode(family);
     }
 

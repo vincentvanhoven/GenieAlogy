@@ -34,7 +34,12 @@
                 severity="secondary"
                 @click="cancel"
             ></Button>
-            <Button type="button" label="Add" @click="confirm" :disabled="!personB"></Button>
+            <Button
+                type="button"
+                label="Add"
+                @click="confirm"
+                :disabled="!personB"
+            ></Button>
         </div>
     </Dialog>
 </template>
@@ -53,8 +58,13 @@
 
     // Computed
     const potentialPeopleB: ComputedRef<Person[]> = computed(() => {
-        let personBSex = saveFileStore.selectedPerson!.sex === 'male' ? 'female' : 'male';
-        return saveFileStore.people!.filter((person) => person.sex === personBSex) ?? [];
+        let personBSex =
+            saveFileStore.selectedPerson!.sex === "male" ? "female" : "male";
+        return (
+            saveFileStore.people!.filter(
+                (person) => person.sex === personBSex,
+            ) ?? []
+        );
     });
 
     // Methods
@@ -71,13 +81,24 @@
 
         // Compute the midpoint between both People for the Partnership node to be placed. Note that the -16 (x) and
         // +32 (y) take the dimensions of the Partnership node into account.
-        const cx = Math.round((personA.position_x + personB.value.position_x - 32 + saveFileStore.personNodeDimensions.x) / 2 / 16) * 16;
-        const cy = Math.round((personA.position_y + personB.value.position_y + 32) / 2 / 16) * 16;
+        const cx =
+            Math.round(
+                (personA.position_x +
+                    personB.value.position_x -
+                    32 +
+                    saveFileStore.personNodeDimensions.x) /
+                    2 /
+                    16,
+            ) * 16;
+        const cy =
+            Math.round(
+                (personA.position_y + personB.value.position_y + 32) / 2 / 16,
+            ) * 16;
 
         let family: Family = {
             id: undefined,
-            male_id: personA.sex === 'male' ? personA.id : personB.value.id,
-            female_id: personA.sex === 'female' ? personA.id : personB.value.id,
+            male_id: personA.sex === "male" ? personA.id : personB.value.id,
+            female_id: personA.sex === "female" ? personA.id : personB.value.id,
             position_x: cx,
             position_y: cy,
         };
