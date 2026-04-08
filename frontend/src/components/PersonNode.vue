@@ -5,7 +5,7 @@
     >
         <Handle
             type="target"
-            :position="Position.Top"
+            :position="targetHandlePosition"
             :class="{ invisible: !connectedHandles.top }"
         />
         <Handle
@@ -65,6 +65,18 @@
             right:
                 (hasSourceEdge && selfPerson.value.sex === "female") ?? false,
         };
+    });
+
+    const targetHandlePosition = computed(() => {
+        let position = selfPerson.value?.parent_arrow_position ?? "top";
+
+        if (position == "top") {
+            return Position.Top;
+        } else if (position == "left") {
+            return Position.Left;
+        } else if (position == "right") {
+            return Position.Right;
+        }
     });
 </script>
 

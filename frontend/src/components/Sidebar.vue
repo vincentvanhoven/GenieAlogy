@@ -16,17 +16,36 @@
             >
                 <h2 class="font-bold text-xl">Editor</h2>
 
-                <Button
-                    label="Edit"
-                    class="leading-4"
-                    :class="{
-                        'cursor-not-allowed': saveFileStore.isEditingPerson,
-                    }"
-                    severity="contrast"
-                    size="small"
-                    :disabled="saveFileStore.isEditingPerson"
-                    @click="saveFileStore.enableEditMode"
-                />
+                <div>
+                    <Button
+                        label="Remove"
+                        class="leading-4 mr-2"
+                        :class="{
+                            'cursor-not-allowed':
+                                saveFileStore.isEditingPerson ||
+                                saveFileStore.isDeletingPerson,
+                        }"
+                        severity="danger"
+                        size="small"
+                        :disabled="
+                            saveFileStore.isEditingPerson ||
+                            saveFileStore.isDeletingPerson
+                        "
+                        @click="saveFileStore.enableDeletePersonMode"
+                    />
+
+                    <Button
+                        label="Edit"
+                        class="leading-4"
+                        :class="{
+                            'cursor-not-allowed': saveFileStore.isEditingPerson,
+                        }"
+                        severity="contrast"
+                        size="small"
+                        :disabled="saveFileStore.isEditingPerson"
+                        @click="saveFileStore.enableEditMode"
+                    />
+                </div>
             </div>
 
             <div class="overflow-auto flex-1 px-4 pb-4">
@@ -141,10 +160,28 @@
                         :options="familyOptions"
                         optionLabel="name"
                         optionValue="id"
-                        class="w-full"
+                        class="w-full mb-4"
                         :disabled="!saveFileStore.isEditingPerson"
                     />
                     <label for="family_id">Parents</label>
+                </FloatLabel>
+
+                <FloatLabel variant="on">
+                    <Select
+                        size="small"
+                        id="parent_arrow_position"
+                        name="parent_arrow_position"
+                        :options="[
+                            { name: 'Top', value: 'top' },
+                            { name: 'Left', value: 'left' },
+                            { name: 'Right', value: 'right' },
+                        ]"
+                        optionLabel="label"
+                        optionValue="value"
+                        class="w-full"
+                        :disabled="!saveFileStore.isEditingPerson"
+                    />
+                    <label for="parent_arrow_position">Arrow position</label>
                 </FloatLabel>
 
                 <Divider align="left" type="solid" class="mb-0">
@@ -156,29 +193,49 @@
 
                     <Column field="name" header="Name"></Column>
 
-                    <Column>
+                    <Column class="w-8">
                         <template #header>
-                            <!--                            <Button-->
-                            <!--                                :class="{'cursor-not-allowed' : !saveFileStore.isEditingPerson }"-->
-                            <!--                                :disabled="!saveFileStore.isEditingPerson"-->
-                            <!--                                severity="contrast"-->
-                            <!--                                size="small"-->
-                            <!--                                icon="pi pi-plus"-->
-                            <!--                                aria-label="Add"-->
-                            <!--                                class="p-1 w-6 h-6"-->
-                            <!--                            />-->
+                            <Button
+                                :class="{
+                                    'cursor-not-allowed':
+                                        !saveFileStore.isEditingPerson,
+                                }"
+                                :disabled="!saveFileStore.isEditingPerson"
+                                severity="contrast"
+                                size="small"
+                                icon="pi pi-plus"
+                                aria-label="Add"
+                                class="p-1 w-6 h-6"
+                                @click="saveFileStore.enableAddFamilyMode"
+                            />
                         </template>
 
-                        <template #body>
-                            <!--                            <Button-->
-                            <!--                                :class="{'cursor-not-allowed' : !saveFileStore.isEditingPerson }"-->
-                            <!--                                :disabled="!saveFileStore.isEditingPerson"-->
-                            <!--                                severity="contrast"-->
-                            <!--                                size="small"-->
-                            <!--                                icon="pi pi-pencil"-->
-                            <!--                                aria-label="Edit"-->
-                            <!--                                class="p-1 w-6 h-6"-->
-                            <!--                            />-->
+                        <template #body="{ data }">
+                            <Button
+                                :class="{
+                                    'cursor-not-allowed':
+                                        !saveFileStore.isEditingPerson,
+                                }"
+                                :disabled="!saveFileStore.isEditingPerson"
+                                severity="danger"
+                                size="small"
+                                icon="pi pi-trash"
+                                aria-label="Remove"
+                                class="p-1 w-6 h-6 mr-1"
+                                @click="removeFamily(data.id)"
+                            />
+
+                            <!--
+                            <Button
+                                :class="{'cursor-not-allowed' : !saveFileStore.isEditingPerson }"
+                                :disabled="!saveFileStore.isEditingPerson"
+                                severity="contrast"
+                                size="small"
+                                icon="pi pi-pencil"
+                                aria-label="Edit"
+                                class="p-1 w-6 h-6"
+                            />
+                            -->
                         </template>
                     </Column>
                 </DataTable>
@@ -254,6 +311,13 @@
 
     function cancelEdit() {
         saveFileStore.disableEditMode();
+    }
+
+    function removeFamily(familyId: number) {
+        let family = saveFileStore.families.find(
+            (family) => family.id === familyId,
+        )!;
+        saveFileStore.enableDeleteFamilyMode(family);
     }
 
     // Computed properties

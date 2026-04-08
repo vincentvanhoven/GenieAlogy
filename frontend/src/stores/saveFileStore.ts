@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import {
     computed,
     ComputedRef,
+    nextTick,
     readonly,
     ref,
     Ref,
@@ -32,7 +33,7 @@ import Person = models.Person;
 export const useSaveFileStore = defineStore("saveFile", () => {
     // Consts
     const personNodeDimensions = { x: 256, y: 64 };
-    const gridSize = 50;
+    const gridSize = 16;
 
     // References
     const gridCanvas: Ref<HTMLCanvasElement | null> = ref(null);
@@ -46,17 +47,19 @@ export const useSaveFileStore = defineStore("saveFile", () => {
     // State flags
     let isSaving: Ref<boolean> = ref(false);
     let isEditingPerson: Ref<boolean> = ref(false);
+    let isDeletingPerson: Ref<boolean> = ref(false);
+    let isAddingFamily: Ref<boolean> = ref(false);
+    let familyToDelete: Ref<Family | null> = ref(null);
 
     // Composables
-    const {
-        getSelectedNodes,
-        addSelectedNodes,
-        onNodesChange,
-        getViewport,
-        project,
-    } = useVueFlow();
+    const { getSelectedNodes, addSelectedNodes, onNodesChange, project } =
+        useVueFlow();
 
     // Computed properties
+    const isDeletingFamily: ComputedRef<boolean> = computed(() => {
+        return !!familyToDelete.value;
+    });
+
     const hasLoadedSaveFile: ComputedRef<boolean> = computed(() => {
         return !!saveFile.value;
     });
@@ -153,8 +156,16 @@ export const useSaveFileStore = defineStore("saveFile", () => {
             })),
         ];
 
+        recomputeEdges();
+    }
+
+    function recomputeEdges() {
         // Reset the edges
         edges.value = [];
+
+        if (!saveFile.value) {
+            return;
+        }
 
         // Init the new edges
         edges.value = [
@@ -219,25 +230,6 @@ export const useSaveFileStore = defineStore("saveFile", () => {
                 type: "person",
                 position: { x: person.position_x, y: person.position_y },
             });
-        });
-    }
-
-    function removeSelectedPerson(person: Person) {
-        // Trigger removal
-        RemovePerson(person).then((newSaveFile: SaveFile) => {
-            // TODO: receive only status OK/FAIL and update local state accordingly
-        });
-    }
-
-    function removeFamily(family: Family) {
-        RemoveFamily(family).then((newSaveFile: SaveFile) => {
-            // TODO: receive only status OK/FAIL and update local state accordingly
-        });
-    }
-
-    function addFamily(family: Family) {
-        AddFamily(family).then((newSaveFile: SaveFile) => {
-            // TODO: receive only status OK/FAIL and update local state accordingly
         });
     }
 
@@ -325,6 +317,170 @@ export const useSaveFileStore = defineStore("saveFile", () => {
         );
     }
 
+    function enableDeletePersonMode() {
+        if (
+            isEditingPerson.value ||
+            isDeletingPerson.value ||
+            !selectedNode.value
+        ) {
+            return;
+        }
+
+        isDeletingPerson.value = true;
+    }
+
+    async function disableDeletePersonMode(confirmed: boolean = false) {
+        if (!isDeletingPerson.value || !selectedPerson.value) {
+            return;
+        }
+
+        isDeletingPerson.value = false;
+
+        if (confirmed) {
+            let personToDelete: Person = { ...selectedPerson.value };
+
+            // Trigger removal
+            let person: Person | null = await RemovePerson(personToDelete);
+
+            // If the Person was removed
+            if (!person) {
+                // There are no descendants, and the Person's families can be scrapped
+                for (let i = saveFile.value!.families.length - 1; i >= 0; i--) {
+                    const f = saveFile.value!.families[i];
+
+                    // If the Person is a partner in this family
+                    if (
+                        f.female_id === personToDelete.id ||
+                        f.male_id === personToDelete.id
+                    ) {
+                        // Scrap the Family's node
+                        let nodeIndex = nodes.value.findIndex(
+                            (node: Node) => node.id === `family-${f.id}`,
+                        );
+                        nodes.value.splice(nodeIndex, 1);
+
+                        // Scrap the Family from the saveFile
+                        saveFile.value!.families.splice(i, 1);
+                    }
+                }
+
+                // Scrap the Person's node
+                let nodeIndex = nodes.value.findIndex(
+                    (node: Node) => node.id === `person-${personToDelete.id}`,
+                );
+                nodes.value.splice(nodeIndex, 1);
+
+                // Scrap the Person from the saveFile
+                let personIndex = saveFile.value!.people.findIndex(
+                    (person: Person) => person.id === personToDelete.id,
+                );
+                saveFile.value!.people.splice(personIndex, 1);
+
+                // Fix up the selected states
+                selectedPerson.value = null;
+                selectedNodes.value = [];
+
+                // Recompute the edges
+                recomputeEdges();
+            } else {
+                // If the Person was not deleted, it was anonymized instead.
+                // This prevents trees with descendants from breaking.
+                selectedPerson.value = { ...person };
+            }
+        }
+    }
+
+    function enableAddFamilyMode() {
+        if (
+            !isEditingPerson.value ||
+            !selectedNode.value ||
+            isAddingFamily.value
+        ) {
+            return;
+        }
+
+        isAddingFamily.value = true;
+    }
+
+    async function disableAddFamilyMode(family: Family | null = null) {
+        if (!isAddingFamily.value || !selectedPerson.value) {
+            return;
+        }
+
+        isAddingFamily.value = false;
+
+        if (family) {
+            AddFamily(family).then((newFamily: Family) => {
+                // Add the Family to the saveFile
+                saveFile.value!.families.push(newFamily);
+
+                // Add the Partnership node
+                nodes.value.push({
+                    id: "family-" + newFamily.id,
+                    type: "family",
+                    position: {
+                        x: newFamily.position_x,
+                        y: newFamily.position_y,
+                    },
+                    //@ts-ignore
+                    origin: [12.5, 12.5],
+                });
+
+                // Recompute the edges
+                recomputeEdges();
+            });
+        }
+    }
+
+    function enableDeleteFamilyMode(family: Family) {
+        if (
+            !isEditingPerson.value ||
+            !selectedNode.value ||
+            isDeletingFamily.value
+        ) {
+            return;
+        }
+
+        familyToDelete.value = family;
+    }
+
+    async function disableDeleteFamilyMode(confirmed: boolean = false) {
+        if (!isDeletingFamily.value || !selectedPerson.value) {
+            return;
+        }
+
+        let familyBeforeDelete: Family = { ...familyToDelete.value! };
+        familyToDelete.value = null;
+
+        if (confirmed) {
+            // Trigger removal
+            RemoveFamily(familyBeforeDelete).then((response) => {
+                // Scrap the Family from the saveFile
+                let familyIndex = saveFile.value!.families.findIndex(
+                    (family) => family.id === familyBeforeDelete.id,
+                );
+                saveFile.value!.families.splice(familyIndex, 1);
+
+                // Scrap the Family's node
+                let nodeIndex = nodes.value.findIndex(
+                    (node: Node) =>
+                        node.id === `family-${familyBeforeDelete.id}`,
+                );
+                nodes.value.splice(nodeIndex, 1);
+
+                // Unset the Family of the direct descendants
+                saveFile.value?.people
+                    .filter(
+                        (person) => person.family_id === familyBeforeDelete.id,
+                    )
+                    .forEach((person) => (person.family_id = undefined));
+
+                // Recompute the edges
+                recomputeEdges();
+            });
+        }
+    }
+
     function enableEditMode() {
         // Ensure that Person edit mode is not already active, and that there is only one selected node
         if (isEditingPerson.value || !selectedNode.value) {
@@ -351,6 +507,11 @@ export const useSaveFileStore = defineStore("saveFile", () => {
                 };
                 await UpdatePerson(updatePayload);
                 selectedPerson.value = updatePayload;
+
+                nextTick(() => {
+                    // Recompute the edges
+                    recomputeEdges();
+                });
             } catch (exception) {
                 // console.log(exception);
             }
@@ -368,6 +529,8 @@ export const useSaveFileStore = defineStore("saveFile", () => {
     }
 
     return {
+        personNodeDimensions,
+        gridSize,
         nodes,
         edges,
         hasLoadedSaveFile,
@@ -379,14 +542,21 @@ export const useSaveFileStore = defineStore("saveFile", () => {
         handleNodesSelectionDrag,
         isSaving,
         isEditingPerson,
+        isDeletingPerson,
+        isAddingFamily,
+        isDeletingFamily,
+        familyToDelete,
         addPerson,
-        removeSelectedPerson,
-        addFamily,
-        removeFamily,
         getPersonFromNode,
         getPersonFromId,
         getPersonDisplayName,
         getFamilyDisplayName,
+        enableDeletePersonMode,
+        disableDeletePersonMode,
+        enableAddFamilyMode,
+        disableAddFamilyMode,
+        enableDeleteFamilyMode,
+        disableDeleteFamilyMode,
         enableEditMode,
         disableEditMode,
     };
